@@ -84,7 +84,12 @@ public class MainWindow {
 		//Hier neue Elemente zum Hauptfenster hinzufügen
 		//vvvvvvvvvvvvvvvvvvvvvvv
 		background.getChildren().addAll(start, backwardBtn, pauseBtn, forwardBtn, stepByStep, txtfSampleSize, algorithmus, orders, test);
+		//Sonstige Initialisierungen
+		txtfSampleSize.setPromptText("Anzahl Elemente");
+		txtfSampleSize.setPrefWidth(55);
 		
+		algorithmus.setPromptText("Algorithmus");
+		orders.setPromptText("Anordnung");
 	}
 	
 	private void posComponents() {
@@ -100,6 +105,8 @@ public class MainWindow {
 	}
 	
 	private void styleComponents(){
+		
+		
 		scene.getStylesheets().add("util/style.css");
 		background.getStyleClass().add("pane");
 		//Style pausebutton
@@ -124,11 +131,7 @@ public class MainWindow {
 		backwardBtn.setGraphic(iv3);
 		
 		//Stylen des Eingabefeldes für die Samplesize
-		txtfSampleSize.setPromptText("Anzahl Elemente");
-		txtfSampleSize.setPrefWidth(55);
 		
-		algorithmus.setPromptText("Algorithmus");
-		orders.setPromptText("Anordnung");
 	}
 	
 	private void testComponents() {		
