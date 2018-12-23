@@ -1,6 +1,5 @@
 package view.mainwindow;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -13,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -24,7 +24,8 @@ public class MainWindow {
 	public static double mainWindowWidth  = 1000;
 	
 	private Stage primaryStage;
-	private Pane background;
+	private BorderPane mainArea;
+	private Pane background;	
 	private Scene scene;
 	private Button start;
 	private Button backwardBtn;
@@ -76,7 +77,7 @@ public class MainWindow {
 		orders 			= new ComboBox<>();
 			orders.getItems().addAll(
 							"Ordered",
-							"Totally Random"
+							"Random"
 					);
 		test			= new Button("Test");
 		
@@ -130,20 +131,8 @@ public class MainWindow {
 		orders.setPromptText("Anordnung");
 	}
 	
-	private void testComponents() {
-		/*System.out.println("Unit left height: " + units.get(left) );
-		System.out.println("Unit right height: " + units.get(right) + "\n");
-		//swapUnit(left, right);
-		System.out.println("Unit left height: " + units.get(left) );
-		System.out.println("Unit right height: " + units.get(right) + "\n");
-		removeUnitFromWindow(left);
-		//removeUnitFromWindow(right);
-		
-		//background.getChildren().add(units.get(left));
-		//background.getChildren().add(units.get(right));
-		*/
-		swapUnit(3, 10);
-		
+	private void testComponents() {		
+		swapUnit(1, 3);	
 	}
 	
 	public Vector<Rectangle> generateUnits(int amount) {
@@ -157,88 +146,69 @@ public class MainWindow {
 			tempUnit = new Rectangle(width, height);
 			tempUnit.setFill(Color.WHITE);
 			units.add(tempUnit);	
-		}
-		
-		
+		}	
 		return units;
 	}
 	
 	
-	public Vector<Rectangle> posRandom() {
-		
-		reverseOrder();
-		Vector<Double> positions = getXPositions();
-		
-		//////////////////////////
-		/*
-		 * Baustelle!
-		 * Collections.shuffle() setzt mir zwar die Positionen
-		 * aber nicht meinen Units-Vector selbst
-		 */
-		/////////////////////////
-		
-		Collections.shuffle(positions);
+	public void posRandom() {
+		//Hilfsvektor um die Positionen zu speichern
+		Vector<Double> xPositios = new Vector<>();
+		posNormal();
 		
 		for(int i = 0; i < units.size(); i++) {
-			
-			//units.get(i).relocate(x, y);
+			double tempPos = units.get(i).getLayoutX();
+			xPositios.add(tempPos);
+		}
+
+		Collections.shuffle(units);
+		
+		for (int i = 0; i < units.size(); i++) {
+			units.get(i).setLayoutX(xPositios.get(i));;
 		}
 		
-		for(int i = 0; i < units.size(); i++) {
-			double xPos = positions.get(i);
-			double yPos = 500 - units.get(i).getHeight();
-			units.get(i).relocate(xPos, yPos);
-		}
-		return units;
 	}
 	
-	public Vector<Rectangle> posNormal() {
+	public void posNormal() {
 		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
 		reverseOrder();
 		
 		for(int i = 0; i < units.size(); i++) {
 			double margin = i;
-			
 			double xPos = (20 + margin) + i * (units.get(i).getWidth());
-			double yPos = 500 - units.get(i).getHeight();
+			double yPos = mainWindowHeight - units.get(i).getHeight();
 			units.get(i).relocate(xPos, yPos);
-		}
-		return units;
+		}	
 	}
-	
-	public void swapUnit(int left, int right) {
-		
-		
+	/*
+	 * Das Speichern der x-Positionen der zu swappenden Elemente
+	 * 
+	 * */
+	public void swapUnit(int left, int right) {	
 		double leftXPos = units.get(left).getLayoutX();
 		double rightXPos = units.get(right).getLayoutX();
 		Collections.swap(units, left, right);
 		units.get(left).setLayoutX(leftXPos);
-		units.get(right).setLayoutX(rightXPos);
-		
+		units.get(right).setLayoutX(rightXPos);	
 	}
 	
 	public void reverseOrder() {
 		Collections.reverse(units);		
-	}
-	
+	}	
 	public void addUnitsToWindow() {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().add(units.get(i));
 		}
 		
 	}
-	
 	public void addUnitToWindow(int index) {
 		background.getChildren().add(units.get(index));
 	}
-	
-	
 	public void removeUnitsFromWindow() {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().remove(units.get(i));
 		}
-	}
-	
+	}	
 	public void removeUnitFromWindow(int index) {
 		background.getChildren().remove(units.get(index));
 	}
@@ -253,15 +223,23 @@ public class MainWindow {
 					removeUnitsFromWindow();
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
-				
 				generateUnits(sampleSize);
 				addUnitsToWindow();
-				posNormal();
-				//posRandom();
-				unitsAreGenerated = true;
+				/*"Ordered",
+					"Random"*/
+				switch(orders.getValue()) {
+					case "Ordered":
+						posNormal(); break;
+						
+					case "Random":
+						posRandom(); break;
+						
+					default: break;
+				}
 				
 				txtfSampleSize.setText("");
-				txtfSampleSize.setPromptText(Integer.toString(sampleSize));			
+				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
+				unitsAreGenerated = true;
 			}				
 		});
 		
