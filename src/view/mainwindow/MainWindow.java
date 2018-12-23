@@ -124,13 +124,12 @@ public class MainWindow {
 		
 		//Stylen des Eingabefeldes für die Samplesize
 		txtfSampleSize.setPromptText("Anzahl Elemente");
-		txtfSampleSize.setPrefWidth(110);
+		txtfSampleSize.setPrefWidth(55);
 		
 		algorithmus.setPromptText("Algorithmus");
 		orders.setPromptText("Anordnung");
 	}
-	int left = 1;
-	int right = 2;
+	
 	private void testComponents() {
 		/*System.out.println("Unit left height: " + units.get(left) );
 		System.out.println("Unit right height: " + units.get(right) + "\n");
@@ -143,9 +142,7 @@ public class MainWindow {
 		//background.getChildren().add(units.get(left));
 		//background.getChildren().add(units.get(right));
 		*/
-		for(Rectangle temp:units) {
-			System.out.println(temp.getHeight());
-		}
+		swapUnit(3, 10);
 		
 	}
 	
@@ -166,16 +163,6 @@ public class MainWindow {
 		return units;
 	}
 	
-	public void addUnitsToWindow() {
-		for(int i = 0; i < units.size(); i++) {
-			background.getChildren().add(units.get(i));
-		}
-		
-	}
-	
-	public void addUnitToWindow(int index) {
-		background.getChildren().add(units.get(index));
-	}
 	
 	public Vector<Rectangle> posRandom() {
 		
@@ -208,45 +195,69 @@ public class MainWindow {
 	public Vector<Rectangle> posNormal() {
 		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
 		reverseOrder();
-		Vector<Double> xPositions = getXPositions();
-		Vector<Double> yPositions = getYPositions();
-		for(int i = 0; i < units.size(); i++) {
-			units.get(i).relocate(xPositions.get(i), yPositions.get(i));
-		}
-		return units;
-	}
-	
-	public Vector<Rectangle> swapUnit(int left, int right) {
-		Rectangle tempUnit = units.get(left);
-		units.set(left, units.get(right));
-		units.set(right, tempUnit);
-		return units;
-	}
-	
-	public Vector<Double> getXPositions() {
-		Vector<Double> positions = new Vector<>();
+		
 		for(int i = 0; i < units.size(); i++) {
 			double margin = i;
+			
 			double xPos = (20 + margin) + i * (units.get(i).getWidth());
-			positions.add(xPos);
+			double yPos = 500 - units.get(i).getHeight();
+			units.get(i).relocate(xPos, yPos);
 		}
-		return positions;
-		
+		return units;
 	}
 	
-	public Vector<Double> getYPositions() {
-		Vector<Double> positions = new Vector<>();
-		for(int i = 0; i < units.size(); i++) {
-			double yPos = 500 - units.get(i).getHeight();
-			positions.add(yPos);
-		}
-		return positions;
+	public void swapUnit(int left, int right) {
+		
+		
+		
+		//removeUnitFromWindow(right);
+		//removeUnitsFromWindow();
+		
+		//units.set(left, units.get(right));
+		//units.set(right, tempUnit);
+		
+		//System.out.println(units.get(left).getLayoutX());
+		//System.out.println(units.get(left).getLayoutY());
+		double leftXPos = units.get(left).getLayoutX();
+		double rightXPos = units.get(right).getLayoutX();
+		Collections.swap(units, left, right);
+		units.get(left).setLayoutX(leftXPos);
+		units.get(right).setLayoutX(rightXPos);
+		//System.out.println(units.get(left).getLayoutX());
+		//System.out.println(units.get(left).getLayoutY());
+		
+		//removeUnitsFromWindow();
+		//System.out.println(left);
+		//addUnitToWindow(3);
+		
+		//double leftYPos = units.get(left).getLayoutY();
+		//double rightYPos = units.get(right).getLayoutY();
+		//units.get(left).setLayoutX(rightXPos);
+		//units.get(right).setLayoutX(leftXPos);
+		
+		//addUnitToWindow(left);
+		//addUnitToWindow(right);
+		//background.getChildren().add(units.get(left));
+		//addUnitsToWindow();
+		
 		
 	}
 	
 	public void reverseOrder() {
 		Collections.reverse(units);		
 	}
+	
+	public void addUnitsToWindow() {
+		for(int i = 0; i < units.size(); i++) {
+			background.getChildren().add(units.get(i));
+		}
+		
+	}
+	
+	public void addUnitToWindow(int index) {
+		background.getChildren().add(units.get(index));
+	}
+	
 	
 	public void removeUnitsFromWindow() {
 		for(int i = 0; i < units.size(); i++) {
@@ -271,8 +282,8 @@ public class MainWindow {
 				
 				generateUnits(sampleSize);
 				addUnitsToWindow();
-				//posInOrder(units);
-				posRandom();
+				posNormal();
+				//posRandom();
 				unitsAreGenerated = true;
 				
 				txtfSampleSize.setText("");
