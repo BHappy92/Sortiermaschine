@@ -36,6 +36,8 @@ public class MainWindow {
 	private TextField txtfSampleSize;
 	private ComboBox<String> algorithmus;
 	private ComboBox<String> orders;
+	private Button test;
+	
 	
 	private ArrayList<Rectangle> units;
 	
@@ -78,10 +80,11 @@ public class MainWindow {
 							"Ordered",
 							"Totally Random"
 					);
+		test			= new Button("Test");
 		
 		//Hier neue Elemente zum Hauptfenster hinzufügen
 		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(start, backwardBtn, pauseBtn, forwardBtn, stepByStep, txtfSampleSize, algorithmus, orders);
+		background.getChildren().addAll(start, backwardBtn, pauseBtn, forwardBtn, stepByStep, txtfSampleSize, algorithmus, orders, test);
 		
 	}
 	
@@ -94,6 +97,7 @@ public class MainWindow {
 		txtfSampleSize.relocate(500, 5);
 		algorithmus.relocate(250, 5);
 		orders.relocate(100, 5);
+		test.relocate(400, 5);
 	}
 	
 	private void styleComponents(){
@@ -129,16 +133,17 @@ public class MainWindow {
 	}
 	
 	private void testComponents() {
-		Rectangle rect1 = new Rectangle(300, 300, 100, 100);
-		Rectangle rect2 = new Rectangle(320, 300, 100, 100);
-		rect1.setFill(Color.RED);
-		rect2.setFill(Color.GREEN);
-		
-		background.getChildren().addAll(rect1,rect2);
-		
-		if (rect1.intersects(rect2.getBoundsInLocal())) {
-			rect2.setWidth(10);
+		int c = 1;
+		for(Rectangle temp : units) {
+			System.out.println("Unit " + (c++) + ":" + temp.getHeight());
 		}
+		reverseOrder(units);
+		for(Rectangle temp : units) {
+			System.out.println("Unit " + (c++) + ":" + temp.getHeight());
+		}
+		
+		generateUnits(units.size());
+		addUnitsToWindow();
 	}
 	
 	public ArrayList<Rectangle> generateUnits(int amount) {
@@ -166,23 +171,39 @@ public class MainWindow {
 	}
 	
 	public ArrayList<Rectangle> posRandom(ArrayList<Rectangle> units) {
-		
-		//Allgemeine initialisierung der Positionen nötig da sonst keine bekannt
-		posInOrder(units);
-		
-		
 		/*Random rnd = new Random();
+		posInOrder(units);
+		ArrayList<Rectangle> tempList = new ArrayList<Rectangle>();
+		for(int i = units.size(); i > 0; i--) {
+			//rnd.nextDouble() * i;
+			int rndPos = rnd.nextInt(i);	
+			tempList.add(units.get(rndPos));
+			
+			units.remove(rndPos);
+		}
+		units = tempList;
+		return units;*/
+		reverseOrder(units);
 		
-		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
-		reverseOrder(units); 
-		
-		for(int i = 0; i < units.length; i++) {
-			double margin = i;
-			double xPos = (20 + margin) + i * (units[i].getWidth());
-			double yPos = 500 - units[i].getHeight();
-			units[i].relocate(xPos, yPos);
-		}*/
 		return units;
+	}
+	
+	public ArrayList<Rectangle> swapUnit(ArrayList<Rectangle> units, int left, int right) {
+		Rectangle tempUnit = units.get(left);
+		units.set(left, units.get(right));
+		units.set(right, tempUnit);
+		return units;
+	}
+	
+	public ArrayList<Double> getPositions(ArrayList<Rectangle> units) {
+		ArrayList<Double> positions = new ArrayList<>();
+		for(int i = 0; i < units.size(); i++) {
+			double margin = i;
+			double xPos = (20 + margin) + i * (units.get(i).getWidth());
+			positions.add(xPos);
+		}
+		return positions;
+		
 	}
 	
 	public ArrayList<Rectangle> posInOrder(ArrayList<Rectangle> units) {
@@ -201,7 +222,11 @@ public class MainWindow {
 		Collections.reverse(units);		
 	}
 	
-	
+	public void removeUnitsFromWindow() {
+		for(int i = 0; i < units.size(); i++) {
+			background.getChildren().remove(units.get(i));
+		}
+	}
 	
 	private void addFunctionality() {
 		
@@ -210,21 +235,27 @@ public class MainWindow {
 			@Override
 			public void handle(ActionEvent event) {
 				if(unitsAreGenerated) {		
-					for(int i = 0; i < units.size(); i++) {
-						background.getChildren().remove(units.get(i));
-					}
+					removeUnitsFromWindow();
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				
 				generateUnits(sampleSize);
 				addUnitsToWindow();
-				//posInOrder(units);
-				posRandom(units);
+				posInOrder(units);
+				//posRandom(units);
 				unitsAreGenerated = true;
 				
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));			
 			}				
+		});
+		
+		test.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				testComponents();
+			}
 		});
 	}
 	
