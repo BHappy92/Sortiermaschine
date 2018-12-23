@@ -2,9 +2,8 @@ package view.mainwindow;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
+import java.util.Vector;
 
-import control.unitControl.UnitControl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -18,7 +17,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import view.units.Unit;
 
 public class MainWindow {
 	
@@ -39,7 +37,7 @@ public class MainWindow {
 	private Button test;
 	
 	
-	private ArrayList<Rectangle> units;
+	private Vector<Rectangle> units;
 	
 	
 	private boolean unitsAreGenerated = false;
@@ -131,23 +129,28 @@ public class MainWindow {
 		algorithmus.setPromptText("Algorithmus");
 		orders.setPromptText("Anordnung");
 	}
-	
+	int left = 1;
+	int right = 2;
 	private void testComponents() {
-		int c = 1;
-		for(Rectangle temp : units) {
-			System.out.println("Unit " + (c++) + ":" + temp.getHeight());
-		}
-		reverseOrder(units);
-		for(Rectangle temp : units) {
-			System.out.println("Unit " + (c++) + ":" + temp.getHeight());
+		/*System.out.println("Unit left height: " + units.get(left) );
+		System.out.println("Unit right height: " + units.get(right) + "\n");
+		//swapUnit(left, right);
+		System.out.println("Unit left height: " + units.get(left) );
+		System.out.println("Unit right height: " + units.get(right) + "\n");
+		removeUnitFromWindow(left);
+		//removeUnitFromWindow(right);
+		
+		//background.getChildren().add(units.get(left));
+		//background.getChildren().add(units.get(right));
+		*/
+		for(Rectangle temp:units) {
+			System.out.println(temp.getHeight());
 		}
 		
-		generateUnits(units.size());
-		addUnitsToWindow();
 	}
 	
-	public ArrayList<Rectangle> generateUnits(int amount) {
-		units = new ArrayList<>(amount);	
+	public Vector<Rectangle> generateUnits(int amount) {
+		units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
 			Rectangle tempUnit;
 			
@@ -163,40 +166,65 @@ public class MainWindow {
 		return units;
 	}
 	
-	private void addUnitsToWindow() {
+	public void addUnitsToWindow() {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().add(units.get(i));
 		}
 		
 	}
 	
-	public ArrayList<Rectangle> posRandom(ArrayList<Rectangle> units) {
-		/*Random rnd = new Random();
-		posInOrder(units);
-		ArrayList<Rectangle> tempList = new ArrayList<Rectangle>();
-		for(int i = units.size(); i > 0; i--) {
-			//rnd.nextDouble() * i;
-			int rndPos = rnd.nextInt(i);	
-			tempList.add(units.get(rndPos));
-			
-			units.remove(rndPos);
-		}
-		units = tempList;
-		return units;*/
-		reverseOrder(units);
+	public void addUnitToWindow(int index) {
+		background.getChildren().add(units.get(index));
+	}
+	
+	public Vector<Rectangle> posRandom() {
 		
+		reverseOrder();
+		Vector<Double> positions = getXPositions();
+		
+		//////////////////////////
+		/*
+		 * Baustelle!
+		 * Collections.shuffle() setzt mir zwar die Positionen
+		 * aber nicht meinen Units-Vector selbst
+		 */
+		/////////////////////////
+		
+		Collections.shuffle(positions);
+		
+		for(int i = 0; i < units.size(); i++) {
+			
+			//units.get(i).relocate(x, y);
+		}
+		
+		for(int i = 0; i < units.size(); i++) {
+			double xPos = positions.get(i);
+			double yPos = 500 - units.get(i).getHeight();
+			units.get(i).relocate(xPos, yPos);
+		}
 		return units;
 	}
 	
-	public ArrayList<Rectangle> swapUnit(ArrayList<Rectangle> units, int left, int right) {
+	public Vector<Rectangle> posNormal() {
+		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
+		reverseOrder();
+		Vector<Double> xPositions = getXPositions();
+		Vector<Double> yPositions = getYPositions();
+		for(int i = 0; i < units.size(); i++) {
+			units.get(i).relocate(xPositions.get(i), yPositions.get(i));
+		}
+		return units;
+	}
+	
+	public Vector<Rectangle> swapUnit(int left, int right) {
 		Rectangle tempUnit = units.get(left);
 		units.set(left, units.get(right));
 		units.set(right, tempUnit);
 		return units;
 	}
 	
-	public ArrayList<Double> getPositions(ArrayList<Rectangle> units) {
-		ArrayList<Double> positions = new ArrayList<>();
+	public Vector<Double> getXPositions() {
+		Vector<Double> positions = new Vector<>();
 		for(int i = 0; i < units.size(); i++) {
 			double margin = i;
 			double xPos = (20 + margin) + i * (units.get(i).getWidth());
@@ -206,19 +234,17 @@ public class MainWindow {
 		
 	}
 	
-	public ArrayList<Rectangle> posInOrder(ArrayList<Rectangle> units) {
-		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
-		reverseOrder(units);
+	public Vector<Double> getYPositions() {
+		Vector<Double> positions = new Vector<>();
 		for(int i = 0; i < units.size(); i++) {
-			double margin = i;
-			double xPos = (20 + margin) + i * (units.get(i).getWidth());
 			double yPos = 500 - units.get(i).getHeight();
-			units.get(i).relocate(xPos, yPos);
+			positions.add(yPos);
 		}
-		return units;
+		return positions;
+		
 	}
 	
-	public void reverseOrder(ArrayList<Rectangle> units) {
+	public void reverseOrder() {
 		Collections.reverse(units);		
 	}
 	
@@ -226,6 +252,10 @@ public class MainWindow {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().remove(units.get(i));
 		}
+	}
+	
+	public void removeUnitFromWindow(int index) {
+		background.getChildren().remove(units.get(index));
 	}
 	
 	private void addFunctionality() {
@@ -241,8 +271,8 @@ public class MainWindow {
 				
 				generateUnits(sampleSize);
 				addUnitsToWindow();
-				posInOrder(units);
-				//posRandom(units);
+				//posInOrder(units);
+				posRandom();
 				unitsAreGenerated = true;
 				
 				txtfSampleSize.setText("");
