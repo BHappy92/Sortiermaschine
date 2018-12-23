@@ -209,37 +209,11 @@ public class MainWindow {
 	public void swapUnit(int left, int right) {
 		
 		
-		
-		//removeUnitFromWindow(right);
-		//removeUnitsFromWindow();
-		
-		//units.set(left, units.get(right));
-		//units.set(right, tempUnit);
-		
-		//System.out.println(units.get(left).getLayoutX());
-		//System.out.println(units.get(left).getLayoutY());
 		double leftXPos = units.get(left).getLayoutX();
 		double rightXPos = units.get(right).getLayoutX();
 		Collections.swap(units, left, right);
 		units.get(left).setLayoutX(leftXPos);
 		units.get(right).setLayoutX(rightXPos);
-		//System.out.println(units.get(left).getLayoutX());
-		//System.out.println(units.get(left).getLayoutY());
-		
-		//removeUnitsFromWindow();
-		//System.out.println(left);
-		//addUnitToWindow(3);
-		
-		//double leftYPos = units.get(left).getLayoutY();
-		//double rightYPos = units.get(right).getLayoutY();
-		//units.get(left).setLayoutX(rightXPos);
-		//units.get(right).setLayoutX(leftXPos);
-		
-		//addUnitToWindow(left);
-		//addUnitToWindow(right);
-		//background.getChildren().add(units.get(left));
-		//addUnitsToWindow();
-		
 		
 	}
 	
