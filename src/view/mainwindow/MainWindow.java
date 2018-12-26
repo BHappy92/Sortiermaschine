@@ -2,6 +2,7 @@ package view.mainwindow;
 
 import java.util.Collections;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -39,7 +40,36 @@ public class MainWindow {
 	private ComboBox<String> algorithmsCB;
 	private ComboBox<String> ordersCB;
 	private Button testBtn;
-	
+	Runnable runnable = new Runnable() {
+
+		@Override
+		public void run() {
+			boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
+			do { //Beginn des Durchlaufs
+				swapped = false;
+				for(int i = 0; i < units.size() - 1; i++) {
+					if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
+						
+						
+						swapUnit(i, i+1);
+						
+						swapped = true;
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					
+				}
+			} while(swapped);
+			Thread.
+		}
+		
+	};
+	Thread t = new Thread(runnable);
 	
 	private Vector<Rectangle> units;
 	
@@ -85,6 +115,7 @@ public class MainWindow {
 							"Ordered",
 							"Random"
 					);
+			ordersCB.getSelectionModel().select(1);;
 		testBtn			= new Button("Test");
 		
 		//Hier neue Elemente zum Hauptfenster hinzufügen
@@ -154,6 +185,21 @@ public class MainWindow {
 		swapUnit(1, 3);	
 	}
 	
+	public void bubbleSort() {
+		
+		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
+		do { //Beginn des Durchlaufs
+			swapped = false;
+			for(int i = 0; i < units.size() - 1; i++) {
+				if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
+					swapUnit(i, i+1);
+					swapped = true;
+					
+				}
+			}
+		} while(swapped);
+	}
+	
 	public Vector<Rectangle> generateUnits(int amount) {
 		units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
@@ -199,10 +245,7 @@ public class MainWindow {
 			units.get(i).relocate(xPos, yPos);
 		}	
 	}
-	/*
-	 * Das Speichern der x-Positionen der zu swappenden Elemente
-	 * 
-	 * */
+	
 	public void swapUnit(int left, int right) {	
 		double leftXPos = units.get(left).getLayoutX();
 		double rightXPos = units.get(right).getLayoutX();
@@ -243,7 +286,6 @@ public class MainWindow {
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				generateUnits(sampleSize);
-				System.out.println(ordersCB.getValue());
 				addUnitsToWindow();
 				/*"Ordered",
 					"Random"*/
@@ -270,9 +312,11 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				testComponents();
+				t.start();
 			}
 		});
+		
+		
 	}
 	
 	
