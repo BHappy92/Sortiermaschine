@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -13,6 +14,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -25,17 +27,18 @@ public class MainWindow {
 	
 	private Stage primaryStage;
 	private BorderPane mainArea;
+	private HBox menuBox;
 	private Pane background;	
 	private Scene scene;
-	private Button start;
+	private Button startBtn;
 	private Button backwardBtn;
 	private Button pauseBtn;
 	private Button forwardBtn;
-	private ToggleButton stepByStep;
+	private ToggleButton stepByStepToggle;
 	private TextField txtfSampleSize;
-	private ComboBox<String> algorithmus;
-	private ComboBox<String> orders;
-	private Button test;
+	private ComboBox<String> algorithmsCB;
+	private ComboBox<String> ordersCB;
+	private Button testBtn;
 	
 	
 	private Vector<Rectangle> units;
@@ -59,49 +62,62 @@ public class MainWindow {
 	private void initComponents() {
 		//Initialisierung der Oberflächenkomponenten
 		//Oberfläche wird erzeugt
-		primaryStage 	= new Stage();
-		background 		= new Pane();
-		scene 			= new Scene(background, mainWindowWidth, mainWindowHeight);
-		start			= new Button("START");
-		backwardBtn		= new Button();
-		pauseBtn 		= new Button();
-		forwardBtn		= new Button();
-		stepByStep 		= new ToggleButton("Step-By-Step");
-		txtfSampleSize	= new TextField();
-		algorithmus		= new ComboBox<>();
-			algorithmus.getItems().addAll(
+		primaryStage 		= new Stage();
+		mainArea			= new BorderPane();
+		menuBox				= new HBox();
+		background 			= new Pane();
+		//scene 				= new Scene(background, mainWindowWidth, mainWindowHeight);
+		scene 				= new Scene(mainArea, mainWindowWidth, mainWindowHeight);
+		startBtn			= new Button("START");
+		backwardBtn			= new Button();
+		pauseBtn 			= new Button();
+		forwardBtn			= new Button();
+		stepByStepToggle	= new ToggleButton("Step-By-Step");
+		txtfSampleSize		= new TextField();
+		algorithmsCB		= new ComboBox<>();
+			algorithmsCB.getItems().addAll(
 							"BubbleSort",
 							"Quicksort",
 							"Countingsort" );
 		
-		orders 			= new ComboBox<>();
-			orders.getItems().addAll(
+		ordersCB 			= new ComboBox<>();
+			ordersCB.getItems().addAll(
 							"Ordered",
 							"Random"
 					);
-		test			= new Button("Test");
+		testBtn			= new Button("Test");
 		
 		//Hier neue Elemente zum Hauptfenster hinzufügen
 		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(start, backwardBtn, pauseBtn, forwardBtn, stepByStep, txtfSampleSize, algorithmus, orders, test);
+		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn);
+		
 		//Sonstige Initialisierungen
+		mainArea.setTop(menuBox);
+		
+		// vvvvvvvvv Wenn ich die Elemente in die HBox einfüge fehlt mir immer das kleinste Unit-Element im Fenster
+		//menuBox.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn);
+		menuBox.setPrefSize(mainWindowWidth, (1/5)*mainWindowHeight);
+		
+		mainArea.setCenter(background);
+		background.setPrefSize(mainWindowWidth, (4/5)*mainWindowHeight);
+
 		txtfSampleSize.setPromptText("Anzahl Elemente");
 		txtfSampleSize.setPrefWidth(55);
 		
-		algorithmus.setPromptText("Algorithmus");
-		orders.setPromptText("Anordnung");
+		algorithmsCB.setPromptText("Algorithmus");
+		ordersCB.setPromptText("Anordnung");
 	}
 	
 	private void posComponents() {
-		start.relocate(5, 5);
+		startBtn.relocate(5, 5);
 		backwardBtn.relocate(700, 5);
 		pauseBtn.relocate(760, 5);
 		forwardBtn.relocate(820, 5);
-		stepByStep.relocate(900, 5);
+		stepByStepToggle.relocate(900, 5);
 		txtfSampleSize.relocate(500, 5);
-		algorithmus.relocate(250, 5);
-		orders.relocate(100, 5);
-		test.relocate(400, 5);
+		algorithmsCB.relocate(250, 5);
+		ordersCB.relocate(100, 5);
+		testBtn.relocate(400, 5);
 	}
 	
 	private void styleComponents(){
@@ -130,8 +146,8 @@ public class MainWindow {
 		iv3.setFitWidth(30);
 		backwardBtn.setGraphic(iv3);
 		
-		//Stylen des Eingabefeldes für die Samplesize
-		
+		menuBox.setStyle("-fx-background-color: black");
+		menuBox.setPadding(new Insets(5, 10, 5, 10));
 	}
 	
 	private void testComponents() {		
@@ -218,7 +234,7 @@ public class MainWindow {
 	
 	private void addFunctionality() {
 		
-		start.setOnAction(new EventHandler<ActionEvent>() {
+		startBtn.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -227,17 +243,21 @@ public class MainWindow {
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				generateUnits(sampleSize);
+				System.out.println(ordersCB.getValue());
 				addUnitsToWindow();
 				/*"Ordered",
 					"Random"*/
-				switch(orders.getValue()) {
+				switch(ordersCB.getValue()) {
 					case "Ordered":
 						posNormal(); break;
 						
 					case "Random":
 						posRandom(); break;
 						
-					default: break;
+					default: 
+						if(ordersCB.getValue() == null)
+							posNormal();
+						break;
 				}
 				
 				txtfSampleSize.setText("");
@@ -246,7 +266,7 @@ public class MainWindow {
 			}				
 		});
 		
-		test.setOnAction(new EventHandler<ActionEvent>() {
+		testBtn.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
 			public void handle(ActionEvent event) {
