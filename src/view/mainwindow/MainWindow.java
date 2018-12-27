@@ -3,6 +3,7 @@ package view.mainwindow;
 import java.util.Collections;
 import java.util.Vector;
 
+import control.unitControl.Koordinate;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -25,8 +26,8 @@ import javafx.stage.Stage;
 
 public class MainWindow {
 	
-	public static double mainWindowHeight = 500;
-	public static double mainWindowWidth  = 1000;
+	public static double mainWindowHeight = 800;
+	public static double mainWindowWidth  = 1500;
 	
 	private Stage primaryStage;
 	private BorderPane mainArea;
@@ -42,43 +43,10 @@ public class MainWindow {
 	private ComboBox<String> algorithmsCB;
 	private ComboBox<String> ordersCB;
 	private Button testBtn;
-	private Label speedLbl;
-	
+	private Label speedLbl;	
 	private int speed;
-	
-	Runnable runnable = new Runnable() {
-
-		@Override
-		public void run() {
-			boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
-			do { //Beginn des Durchlaufs
-				swapped = false;
-				for(int i = 0; i < units.size() - 1; i++) {
-					if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
-						
-						
-						swapUnit(i, i+1);
-						
-						swapped = true;
-						try {
-							Thread.sleep(speed);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					
-					
-				}
-			} while(swapped);
-			
-		}
-		
-	};
-	
-	
 	private Vector<Rectangle> units;
-	
+	private Vector<Koordinate> swaps;
 	
 	private boolean unitsAreGenerated = false;
 	
@@ -90,7 +58,7 @@ public class MainWindow {
 		addFunctionality();
 		//testComponents();
 		primaryStage.setScene(scene);
-		primaryStage.setResizable(false);
+		//primaryStage.setResizable(false);
 		primaryStage.show();
 		
 	}
@@ -110,6 +78,7 @@ public class MainWindow {
 		stepByStepToggle	= new ToggleButton("Step-By-Step");
 		txtfSampleSize		= new TextField();
 		algorithmsCB		= new ComboBox<>();
+		swaps 				= new Vector<Koordinate>();
 			algorithmsCB.getItems().addAll(
 							"BubbleSort",
 							"Quicksort",
@@ -190,7 +159,19 @@ public class MainWindow {
 	private void testComponents() {		
 		swapUnit(1, 3);	
 	}
+	public static void delayms(int delay) {
+		long now = 0;
+		long later = System.currentTimeMillis()+delay;
+		while (now < later) {
+			now = System.currentTimeMillis();
+			
+		}
+		
+		
+	}
+	
 	public void bubbleSort() {	
+		int count = 0;
 		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
 		do { //Beginn des Durchlaufs
 			swapped = false;
@@ -199,13 +180,14 @@ public class MainWindow {
 					swapUnit(i, i+1);
 					swapped = true;
 					
+					
 				}
-				units.get(i+1).setFill(Color.GREEN);
+				
 			}
 			
 		} while(swapped);
 	}
-	public Vector<Rectangle> generateUnits(int amount) {
+	public void generateUnits(int amount) {
 		units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
 			Rectangle tempUnit;
@@ -217,7 +199,6 @@ public class MainWindow {
 			tempUnit.setFill(Color.WHITE);
 			units.add(tempUnit);	
 		}	
-		return units;
 	}
 	public void posRandom() {
 		//Hilfsvektor um die Positionen zu speichern
@@ -252,7 +233,8 @@ public class MainWindow {
 		double rightXPos = units.get(right).getLayoutX();
 		Collections.swap(units, left, right);
 		units.get(left).setLayoutX(leftXPos);
-		units.get(right).setLayoutX(rightXPos);	
+		units.get(right).setLayoutX(rightXPos);
+		
 	}	
 	public void reverseOrder() {
 		Collections.reverse(units);		
@@ -275,6 +257,23 @@ public class MainWindow {
 		background.getChildren().remove(units.get(index));
 	}
 	
+	public void initSwaps() {
+		
+		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
+		do { //Beginn des Durchlaufs
+			swapped = false;
+			for(int i = 0; i < units.size() - 1; i++) {
+				int left = i;
+				int right = i+1;
+				if(units.get(left).getHeight() > units.get(right).getHeight()) {
+					swaps.add(new Koordinate(left, right));
+					swapped = true;
+				}	
+			}
+			
+		} while(swapped);
+	}
+	
 	Service<Void> service = new Service<Void>() {
 
 		@Override
@@ -283,30 +282,48 @@ public class MainWindow {
 
 				@Override
 				protected Void call() throws Exception {
+					//bubbleSort();
+					
+					int swaps = 0;
 					boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
 					do { //Beginn des Durchlaufs
 						swapped = false;
 						for(int i = 0; i < units.size() - 1; i++) {
-							if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
-								
-								
-								swapUnit(i, i+1);
-								
+							int left = i;
+							int right = i+1;
+							units.get(left).setFill(Color.GREEN);
+							swaps++; //Zählt die Anzahl an swaps
+							if(units.get(left).getHeight() > units.get(right).getHeight()) {
+								swapUnit(left, right);	
+								Thread.sleep(speed);
 								swapped = true;
-								try {
-									Thread.sleep(speed);
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}	
+							}
+							units.get(i).setFill(Color.WHITE);
+							swaps++;
 						}
+						
 					} while(swapped);
+					System.out.println(swaps);
 					return null;				
 				}							
 			};
 		}					
 	}; 
+	public void initOrder() {
+		switch(ordersCB.getValue()) {
+		case "Ordered":
+			posNormal(); break;
+			
+		case "Random":
+			posRandom(); break;
+			
+		default: 
+			if(ordersCB.getValue() == null)
+				posNormal();
+			break;
+		}
+	}
+	
 	
 	private void addFunctionality() {	
 		startBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -319,26 +336,14 @@ public class MainWindow {
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				generateUnits(sampleSize);
 				addUnitsToWindow();
-			
-				switch(ordersCB.getValue()) {
-					case "Ordered":
-						posNormal(); break;
-						
-					case "Random":
-						posRandom(); break;
-						
-					default: 
-						if(ordersCB.getValue() == null)
-							posNormal();
-						break;
-				}
+				initOrder();
 				
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
 				unitsAreGenerated = true;
-				speed = 100;
+				speed = 500;
 				speedLbl.setText("Speed: "+speed);
-				service.start();
+				//bubbleSort();
 						
 			}				
 		});
@@ -347,6 +352,12 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
+				//bubbleSort();
+				
+				if(service.isRunning()) {
+					service.cancel();
+				}
+				service.restart();
 				
 			}
 		});	
@@ -355,7 +366,7 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				speed -= 2;
+				speed -= 10;
 				speedLbl.setText("Speed: "+speed);
 			}
 		});
@@ -364,7 +375,7 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				speed += 2;
+				speed += 10;
 				speedLbl.setText("Speed: "+speed);
 			}
 		});
