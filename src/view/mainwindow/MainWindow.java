@@ -2,14 +2,16 @@ package view.mainwindow;
 
 import java.util.Collections;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
@@ -40,6 +42,10 @@ public class MainWindow {
 	private ComboBox<String> algorithmsCB;
 	private ComboBox<String> ordersCB;
 	private Button testBtn;
+	private Label speedLbl;
+	
+	private int speed;
+	
 	Runnable runnable = new Runnable() {
 
 		@Override
@@ -55,7 +61,7 @@ public class MainWindow {
 						
 						swapped = true;
 						try {
-							Thread.sleep(100);
+							Thread.sleep(speed);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -65,11 +71,11 @@ public class MainWindow {
 					
 				}
 			} while(swapped);
-			Thread.
+			
 		}
 		
 	};
-	Thread t = new Thread(runnable);
+	
 	
 	private Vector<Rectangle> units;
 	
@@ -88,7 +94,6 @@ public class MainWindow {
 		primaryStage.show();
 		
 	}
-	
 	private void initComponents() {
 		//Initialisierung der Oberflächenkomponenten
 		//Oberfläche wird erzeugt
@@ -116,11 +121,12 @@ public class MainWindow {
 							"Random"
 					);
 			ordersCB.getSelectionModel().select(1);;
-		testBtn			= new Button("Test");
+		testBtn				= new Button("Test");
 		
+		speedLbl			= new Label("Speed: "+speed);
 		//Hier neue Elemente zum Hauptfenster hinzufügen
 		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn);
+		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, speedLbl);
 		
 		//Sonstige Initialisierungen
 		mainArea.setTop(menuBox);
@@ -137,8 +143,9 @@ public class MainWindow {
 		
 		algorithmsCB.setPromptText("Algorithmus");
 		ordersCB.setPromptText("Anordnung");
+		
+		
 	}
-	
 	private void posComponents() {
 		startBtn.relocate(5, 5);
 		backwardBtn.relocate(700, 5);
@@ -149,11 +156,9 @@ public class MainWindow {
 		algorithmsCB.relocate(250, 5);
 		ordersCB.relocate(100, 5);
 		testBtn.relocate(400, 5);
-	}
-	
+		speedLbl.relocate(580, 5);
+	}	
 	private void styleComponents(){
-		
-		
 		scene.getStylesheets().add("util/style.css");
 		background.getStyleClass().add("pane");
 		//Style pausebutton
@@ -179,14 +184,13 @@ public class MainWindow {
 		
 		menuBox.setStyle("-fx-background-color: black");
 		menuBox.setPadding(new Insets(5, 10, 5, 10));
+		
+		speedLbl.setTextFill(Color.WHITE);
 	}
-	
 	private void testComponents() {		
 		swapUnit(1, 3);	
 	}
-	
-	public void bubbleSort() {
-		
+	public void bubbleSort() {	
 		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
 		do { //Beginn des Durchlaufs
 			swapped = false;
@@ -196,10 +200,11 @@ public class MainWindow {
 					swapped = true;
 					
 				}
+				units.get(i+1).setFill(Color.GREEN);
 			}
+			
 		} while(swapped);
 	}
-	
 	public Vector<Rectangle> generateUnits(int amount) {
 		units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
@@ -214,8 +219,6 @@ public class MainWindow {
 		}	
 		return units;
 	}
-	
-	
 	public void posRandom() {
 		//Hilfsvektor um die Positionen zu speichern
 		Vector<Double> xPositios = new Vector<>();
@@ -232,8 +235,7 @@ public class MainWindow {
 			units.get(i).setLayoutX(xPositios.get(i));;
 		}
 		
-	}
-	
+	}	
 	public void posNormal() {
 		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
 		reverseOrder();
@@ -244,16 +246,14 @@ public class MainWindow {
 			double yPos = mainWindowHeight - units.get(i).getHeight();
 			units.get(i).relocate(xPos, yPos);
 		}	
-	}
-	
+	}	
 	public void swapUnit(int left, int right) {	
 		double leftXPos = units.get(left).getLayoutX();
 		double rightXPos = units.get(right).getLayoutX();
 		Collections.swap(units, left, right);
 		units.get(left).setLayoutX(leftXPos);
 		units.get(right).setLayoutX(rightXPos);	
-	}
-	
+	}	
 	public void reverseOrder() {
 		Collections.reverse(units);		
 	}	
@@ -275,8 +275,40 @@ public class MainWindow {
 		background.getChildren().remove(units.get(index));
 	}
 	
-	private void addFunctionality() {
-		
+	Service<Void> service = new Service<Void>() {
+
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+
+				@Override
+				protected Void call() throws Exception {
+					boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
+					do { //Beginn des Durchlaufs
+						swapped = false;
+						for(int i = 0; i < units.size() - 1; i++) {
+							if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
+								
+								
+								swapUnit(i, i+1);
+								
+								swapped = true;
+								try {
+									Thread.sleep(speed);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}	
+						}
+					} while(swapped);
+					return null;				
+				}							
+			};
+		}					
+	}; 
+	
+	private void addFunctionality() {	
 		startBtn.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -287,8 +319,7 @@ public class MainWindow {
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				generateUnits(sampleSize);
 				addUnitsToWindow();
-				/*"Ordered",
-					"Random"*/
+			
 				switch(ordersCB.getValue()) {
 					case "Ordered":
 						posNormal(); break;
@@ -305,6 +336,10 @@ public class MainWindow {
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
 				unitsAreGenerated = true;
+				speed = 100;
+				speedLbl.setText("Speed: "+speed);
+				service.start();
+						
 			}				
 		});
 		
@@ -312,12 +347,26 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				t.start();
+				
+			}
+		});	
+		
+		forwardBtn.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				speed -= 2;
+				speedLbl.setText("Speed: "+speed);
 			}
 		});
 		
-		
-	}
-	
-	
+		backwardBtn.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				speed += 2;
+				speedLbl.setText("Speed: "+speed);
+			}
+		});
+	}	
 }
