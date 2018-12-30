@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import control.unitControl.Koordinate;
+import control.unitControl.UnitControl;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -49,6 +50,8 @@ public class MainWindow {
 	private Vector<Koordinate> swaps;
 	
 	private boolean unitsAreGenerated = false;
+	
+	
 	
 	public MainWindow() {
 		
@@ -187,7 +190,7 @@ public class MainWindow {
 			
 		} while(swapped);
 	}
-	public void generateUnits(int amount) {
+	/*public void generateUnits(int amount) {
 		units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
 			Rectangle tempUnit;
@@ -199,7 +202,7 @@ public class MainWindow {
 			tempUnit.setFill(Color.WHITE);
 			units.add(tempUnit);	
 		}	
-	}
+	}*/
 	public void posRandom() {
 		//Hilfsvektor um die Positionen zu speichern
 		Vector<Double> xPositios = new Vector<>();
@@ -334,7 +337,8 @@ public class MainWindow {
 					removeUnitsFromWindow();
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
-				generateUnits(sampleSize);
+				units = UnitControl.generateUnits(sampleSize);
+				//generateUnits(sampleSize);   //Hier werden die Units in der MainWindow Klasse generiert
 				addUnitsToWindow();
 				initOrder();
 				
