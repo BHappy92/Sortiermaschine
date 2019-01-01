@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import control.unitControl.Koordinate;
+import control.unitControl.Positionen;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -23,6 +24,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
+
+
+
 
 public class MainWindow {
 	
@@ -47,7 +52,7 @@ public class MainWindow {
 	private int speed;
 	private Vector<Rectangle> units;
 	private Vector<Koordinate> swaps;
-	
+	//private Positionen positionen;
 	private boolean unitsAreGenerated = false;
 	
 	public MainWindow() {
@@ -236,6 +241,14 @@ public class MainWindow {
 		units.get(right).setLayoutX(rightXPos);
 		
 	}	
+	
+	public void swapUnit(Vector<Rectangle> units, int left, int right) {
+		double leftXPos = units.get(left).getLayoutX();
+		double rightXPos = units.get(right).getLayoutX();
+		Collections.swap(units, left, right);
+		units.get(left).setLayoutX(leftXPos);
+		units.get(right).setLayoutX(rightXPos);
+	}
 	public void reverseOrder() {
 		Collections.reverse(units);		
 	}	
@@ -256,24 +269,30 @@ public class MainWindow {
 	public void removeUnitFromWindow(int index) {
 		background.getChildren().remove(units.get(index));
 	}
-	
+	//----------------------------Beustelle------------------------------
 	public void initSwaps() {
 		
+		Positionen positionen = new Positionen(units);
+	
 		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
 		do { //Beginn des Durchlaufs
 			swapped = false;
-			for(int i = 0; i < units.size() - 1; i++) {
+			for(int i = 0; i < positionen.size() - 1; i++) {
 				int left = i;
 				int right = i+1;
-				if(units.get(left).getHeight() > units.get(right).getHeight()) {
+				
+				if(positionen.getY(left) > positionen.getY(right)) {
 					swaps.add(new Koordinate(left, right));
+					Positionen.swapX(positionen.getAllX(), left, right);
+					Positionen.swapY(positionen.getAllY(), left, right);
+					//System.out.println("Cunt:" + cunt);
 					swapped = true;
 				}	
 			}
 			
 		} while(swapped);
 	}
-	
+	//-------------------------------------------------------------------
 	Service<Void> service = new Service<Void>() {
 
 		@Override
@@ -282,28 +301,12 @@ public class MainWindow {
 
 				@Override
 				protected Void call() throws Exception {
-					//bubbleSort();
-					
-					int swaps = 0;
-					boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
-					do { //Beginn des Durchlaufs
-						swapped = false;
-						for(int i = 0; i < units.size() - 1; i++) {
-							int left = i;
-							int right = i+1;
-							units.get(left).setFill(Color.GREEN);
-							swaps++; //Zählt die Anzahl an swaps
-							if(units.get(left).getHeight() > units.get(right).getHeight()) {
-								swapUnit(left, right);	
-								Thread.sleep(speed);
-								swapped = true;
-							}
-							units.get(i).setFill(Color.WHITE);
-							swaps++;
-						}
-						
-					} while(swapped);
-					System.out.println(swaps);
+					for (int i = 0; i < swaps.size(); i++) {
+						int left = swaps.get(i).getLeft();
+						int right = swaps.get(i).getRight();
+						swapUnit(left, right);
+						Thread.sleep(speed);
+					}
 					return null;				
 				}							
 			};
@@ -337,6 +340,7 @@ public class MainWindow {
 				generateUnits(sampleSize);
 				addUnitsToWindow();
 				initOrder();
+				initSwaps();
 				
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
