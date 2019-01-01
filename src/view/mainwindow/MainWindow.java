@@ -3,6 +3,7 @@ package view.mainwindow;
 import java.util.Collections;
 import java.util.Vector;
 
+import control.sortcontrol.BubbleSort;
 import control.unitControl.Swap;
 import control.unitControl.UnitControl;
 import control.unitControl.UnitValues;
@@ -255,7 +256,9 @@ public class MainWindow {
 		case "Random":
 			UnitControl.posRandom(units); 
 			unitValues = UnitControl.initUnitValues(units);
-			swaps = UnitControl.initSwaps(unitValues);
+			
+			//Das hier geht nicht weil die Methode so noch nicht existiert
+			swaps = BubbleSort.sort(unitValues);
 			for(Rectangle unit : units) System.out.println(unit);
 			break;
 			

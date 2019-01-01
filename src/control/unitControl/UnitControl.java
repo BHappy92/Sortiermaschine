@@ -3,8 +3,6 @@ package control.unitControl;
 import java.util.Collections;
 import java.util.Vector;
 
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -14,14 +12,21 @@ import view.mainwindow.MainWindow;
 public class UnitControl {
 	
 	
-	public static Vector<Rectangle> generateUnits(int amount) {
-		Vector<Rectangle> units = new Vector<>(amount);	
-		for(int i = 0; i < amount; i++) {
+	public static Vector<Rectangle> generateUnits(int n) {
+		Vector<Rectangle> units = new Vector<>(n);	
+		double minHeight = 50;
+		double maxHeight = MainWindow.mainWindowHeight-100;
+		double delta = (maxHeight - minHeight) / n;
+		for(int i = 0; i < n; i++) {
 			Rectangle tempUnit;
 			//System.out.println("Hier entsteht eine neue Unit");
 			//(...-40) damit man links und rechts einen Abstand vom mainWindow hat
-			double width = ((MainWindow.mainWindowWidth - 40) / amount) - 1;		
-			double height = (MainWindow.mainWindowHeight-100) - ((380/(amount-1))*i);
+			double width = ((MainWindow.mainWindowWidth - 40) / n) - 1;
+			
+			
+			//double height = (MainWindow.mainWindowHeight-100) - ((380/(n-1))*i);
+			double height = minHeight + i*delta;
+			
 			//double height = ((8/10)*MainWindow.mainWindowHeight) - ((380/(amount-1))*i);
 			tempUnit = new Rectangle(width, height);
 			tempUnit.setFill(Color.WHITE);
@@ -104,31 +109,6 @@ public class UnitControl {
 		background.getChildren().remove(units.get(index));
 	}
 	
-	public static Vector<Swap> initSwaps(Vector<UnitValues> unitValues) {
-		//reverseOrder(units);
-		Vector<Swap> swaps = new Vector<>();
-		
-		
-		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
-		do { //Beginn des Durchlaufs
-			swapped = false;
-			for(int i = 0; i < unitValues.size() - 1; i++) {
-				int left = i;
-				int right = i+1;
-				double leftHeight = unitValues.get(left).getHeight();
-				double rightHeight = unitValues.get(right).getHeight();
-				if(leftHeight > rightHeight) {
-					swaps.add(new Swap(left, right));
-					Collections.swap(unitValues, left, right);
-					swapped = true;
-				}	
-				
-			}
-			
-		} while(swapped);
-		
-		return swaps;
-	}
-	
+
 	
 }
