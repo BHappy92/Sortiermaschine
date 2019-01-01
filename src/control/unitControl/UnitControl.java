@@ -11,7 +11,9 @@ import view.mainwindow.MainWindow;
 
 public class UnitControl {
 	
-	
+	/*
+	 * n steht für die Anzahl der Units
+	 * */
 	public static Vector<Rectangle> generateUnits(int n) {
 		Vector<Rectangle> units = new Vector<>(n);	
 		double minHeight = 50;
@@ -19,15 +21,10 @@ public class UnitControl {
 		double delta = (maxHeight - minHeight) / n;
 		for(int i = 0; i < n; i++) {
 			Rectangle tempUnit;
-			//System.out.println("Hier entsteht eine neue Unit");
-			//(...-40) damit man links und rechts einen Abstand vom mainWindow hat
+			
 			double width = ((MainWindow.mainWindowWidth - 40) / n) - 1;
-			
-			
-			//double height = (MainWindow.mainWindowHeight-100) - ((380/(n-1))*i);
 			double height = minHeight + i*delta;
-			
-			//double height = ((8/10)*MainWindow.mainWindowHeight) - ((380/(amount-1))*i);
+		
 			tempUnit = new Rectangle(width, height);
 			tempUnit.setFill(Color.WHITE);
 			units.add(tempUnit);	
@@ -37,7 +34,7 @@ public class UnitControl {
 	
 	public static void posNormal(Vector<Rectangle> units) {
 		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
-		reverseOrder(units);
+		//reverseOrder(units);
 		
 		for(int i = 0; i < units.size(); i++) {
 			double margin = i;

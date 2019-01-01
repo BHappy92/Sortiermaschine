@@ -47,7 +47,7 @@ public class MainWindow {
 	private Scene scene;
 	private HBox menuBox;
 	private Pane background;	
-	private Button startBtn;
+	private Button generateBtn;
 	private Button backwardBtn;
 	private Button pauseBtn;
 	private Button forwardBtn;
@@ -55,7 +55,7 @@ public class MainWindow {
 	private TextField txtfSampleSize;
 	private ComboBox<String> algorithmsCB;
 	private ComboBox<String> ordersCB;
-	private Button testBtn;
+	private Button startBtn;
 	private Label delayLbl;	
 	
 	private Vector<Rectangle> units;
@@ -63,7 +63,7 @@ public class MainWindow {
 	private Vector<UnitValues> unitValues;
 	private boolean unitsAreGenerated = false;
 	
-	private int delay = 200;
+	
 	
 	public MainWindow() {
 		
@@ -96,7 +96,7 @@ public class MainWindow {
 		background 			= new Pane();
 		//scene 				= new Scene(background, mainWindowWidth, mainWindowHeight);
 		scene 				= new Scene(root, mainWindowWidth, mainWindowHeight);
-		startBtn			= new Button("START");
+		generateBtn			= new Button("Generate");
 		backwardBtn			= new Button();
 		pauseBtn 			= new Button();
 		forwardBtn			= new Button();
@@ -109,19 +109,20 @@ public class MainWindow {
 							"BubbleSort",
 							"Quicksort",
 							"Countingsort" );
-		
+			algorithmsCB.getSelectionModel().selectFirst();
 		ordersCB 			= new ComboBox<>();
 			ordersCB.getItems().addAll(
 							"Ordered",
 							"Random"
 					);
 			ordersCB.getSelectionModel().select(1);;
-		testBtn				= new Button("Test");
+		startBtn				= new Button("Start");
 		
-		delayLbl			= new Label("Delay: "+delay);
+		delayLbl			= new Label("Delay: "+BubbleSort.delay);
 		//Hier neue Elemente zum Hauptfenster hinzuf�gen
 		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, delayLbl);
+		background.getChildren().addAll(generateBtn, backwardBtn, pauseBtn, forwardBtn, 
+				stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, startBtn, delayLbl);
 		
 		//Sonstige Initialisierungen
 		root.setTop(menuBox);
@@ -142,7 +143,7 @@ public class MainWindow {
 		
 	}
 	private void posComponents() {
-		startBtn.relocate(5, 5);
+		generateBtn.relocate(5, 5);
 		backwardBtn.relocate(700, 5);
 		pauseBtn.relocate(760, 5);
 		forwardBtn.relocate(820, 5);
@@ -150,7 +151,7 @@ public class MainWindow {
 		txtfSampleSize.relocate(500, 5);
 		algorithmsCB.relocate(250, 5);
 		ordersCB.relocate(100, 5);
-		testBtn.relocate(400, 5);
+		startBtn.relocate(400, 5);
 		delayLbl.relocate(580, 5);
 	}	
 	private void styleComponents(){
@@ -182,9 +183,7 @@ public class MainWindow {
 		
 		delayLbl.setTextFill(Color.WHITE);
 	}
-	private void testComponents() {		
-		UnitControl.swapUnit(units, 1, 3);	
-	}
+	
 	public static void delayms(int delay) {
 		long now = 0;
 		long later = System.currentTimeMillis()+delay;
@@ -196,70 +195,16 @@ public class MainWindow {
 		
 	}
 	
-	public void bubbleSort() {	
-		int count = 0;
-		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
-		do { //Beginn des Durchlaufs
-			swapped = false;
-			for(int i = 0; i < units.size() - 1; i++) {
-				if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
-					UnitControl.swapUnit(units, i, i+1);
-					swapped = true;
-					
-					
-				}
-				
-			}
-			
-		} while(swapped);
-	}
-	
-	Service<Void> sort = new Service<Void>() {
-
-		@Override
-		protected Task<Void> createTask() {
-			return new Task<Void>() {
-
-				@Override
-				protected Void call() throws Exception {
-					System.out.println(swaps.size());
-					for(Swap temp : swaps) {
-						String ausgabe = "Left: " +temp.getLeft() + " Right: " + temp.getRight();
-						System.out.println(ausgabe);
-					}
-					for(int i = 0; i < swaps.size(); i++) {
-						int left = swaps.get(i).getLeft();
-						int right = swaps.get(i).getRight();
-						units.get(left).setFill(Color.RED);
-						units.get(right).setFill(Color.GREEN);
-						Thread.sleep(delay/3);
-						UnitControl.swapUnit(units, left, right);
-						units.get(left).setFill(Color.GREEN);
-						units.get(right).setFill(Color.RED);
-						Thread.sleep(delay/3);
-						units.get(left).setFill(Color.WHITE);
-						units.get(right).setFill(Color.WHITE);
-						//Thread.sleep(delay/3);
-					}
-					return null;	
-					
-				}							
-			};
-		}					
-	}; 
 	public void initOrderCB() {
 		switch(ordersCB.getValue()) {
 		case "Ordered":
 			UnitControl.posNormal(units); 
+			unitValues = UnitControl.initUnitValues(units);
 			break;
 			
 		case "Random":
 			UnitControl.posRandom(units); 
 			unitValues = UnitControl.initUnitValues(units);
-			
-			//Das hier geht nicht weil die Methode so noch nicht existiert
-			swaps = BubbleSort.sort(unitValues);
-			for(Rectangle unit : units) System.out.println(unit);
 			break;
 			
 		default: 
@@ -270,8 +215,9 @@ public class MainWindow {
 	}
 	
 	
+	
 	private void addFunctionality() {	
-		startBtn.setOnAction(new EventHandler<ActionEvent>() {
+		generateBtn.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -280,10 +226,10 @@ public class MainWindow {
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				units = UnitControl.generateUnits(sampleSize);
-				
 				UnitControl.addUnitsToWindow(background, units);
 				
 				initOrderCB();
+				
 				
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
@@ -295,16 +241,16 @@ public class MainWindow {
 			}				
 		});
 		
-		testBtn.setOnAction(new EventHandler<ActionEvent>() {
+		startBtn.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				//bubbleSort();
-				
-				if(sort.isRunning()) {
-					sort.cancel();
+				switch(algorithmsCB.getValue()) {
+					case "BubbleSort":
+						BubbleSort sort = new BubbleSort(units, unitValues, 200);
+						delayLbl.setText("Delay: "+BubbleSort.delay);
+						sort.start();
 				}
-				sort.restart();
 				
 			}
 		});	
@@ -313,8 +259,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				delay -= 10;
-				delayLbl.setText("Delay: "+delay);
+				BubbleSort.delay -= 10;
+				delayLbl.setText("Delay: "+BubbleSort.delay);
 			}
 		});
 		
@@ -322,8 +268,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				delay += 10;
-				delayLbl.setText("Delay: "+delay);
+				BubbleSort.delay += 10;
+				delayLbl.setText("Delay: "+BubbleSort.delay);
 			}
 		});
 	}	

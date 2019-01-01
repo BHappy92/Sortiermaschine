@@ -9,48 +9,52 @@ import control.unitControl.UnitValues;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
-public class BubbleSort {
+public class BubbleSort extends Thread{
 	private Vector<Swap> swaps;
+	private Vector<UnitValues> unitValues;
+	private Vector<Rectangle> units;
+	public static int delay;
 	
-	//Der untere Teil hier muss noch erledigt werden
 	
-	/*Service<Void> sort = new Service<Void>() {
 
-		@Override
-		protected Task<Void> createTask() {
-			return new Task<Void>() {
-
-				@Override
-				protected Void call() throws Exception {
-					System.out.println(swaps.size());
-					for(Swap temp : swaps) {
-						String ausgabe = "Left: " +temp.getLeft() + " Right: " + temp.getRight();
-						System.out.println(ausgabe);
-					}
-					for(int i = 0; i < swaps.size(); i++) {
-						int left = swaps.get(i).getLeft();
-						int right = swaps.get(i).getRight();
-						units.get(left).setFill(Color.RED);
-						units.get(right).setFill(Color.GREEN);
-						Thread.sleep(delay/3);
-						UnitControl.swapUnit(units, left, right);
-						units.get(left).setFill(Color.GREEN);
-						units.get(right).setFill(Color.RED);
-						Thread.sleep(delay/3);
-						units.get(left).setFill(Color.WHITE);
-						units.get(right).setFill(Color.WHITE);
-						//Thread.sleep(delay/3);
-					}
-					return null;	
-					
-				}							
-			};
-		}					
-	}; */
+	public BubbleSort(Vector<Rectangle> units, Vector<UnitValues> unitValues, int initialDelay) {
+		this.units 		= units;
+		this.unitValues = unitValues;
+		this.swaps 		= initSwaps();
+		delay = initialDelay;
+	}
 	
-	public static Vector<Swap> initSwaps(Vector<UnitValues> unitValues) {
-		//reverseOrder(units);
+	public void run() {
+		for(int i = 0; i < swaps.size(); i++) {
+			int left = swaps.get(i).getLeft();
+			int right = swaps.get(i).getRight();
+			units.get(left).setFill(Color.RED);
+			units.get(right).setFill(Color.GREEN);
+			try {
+				Thread.sleep(delay/2);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			UnitControl.swapUnit(units, left, right);
+			units.get(left).setFill(Color.GREEN);
+			units.get(right).setFill(Color.RED);
+			try {
+				Thread.sleep(delay/2);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			units.get(left).setFill(Color.WHITE);
+			units.get(right).setFill(Color.WHITE);
+			//Thread.sleep(delay/3);
+		}
+	}
+	
+	
+	public Vector<Swap> initSwaps() {
 		Vector<Swap> swaps = new Vector<>();
 		
 		
@@ -74,4 +78,6 @@ public class BubbleSort {
 		
 		return swaps;
 	}
+	
+	
 }
