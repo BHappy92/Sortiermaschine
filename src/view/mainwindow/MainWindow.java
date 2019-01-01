@@ -55,6 +55,8 @@ public class MainWindow {
 	//private Positionen positionen;
 	private boolean unitsAreGenerated = false;
 	
+	
+	
 	public MainWindow() {
 		
 		initComponents();	
@@ -68,8 +70,8 @@ public class MainWindow {
 		
 	}
 	private void initComponents() {
-		//Initialisierung der Oberflächenkomponenten
-		//Oberfläche wird erzeugt
+		//Initialisierung der Oberflï¿½chenkomponenten
+		//Oberflï¿½che wird erzeugt
 		primaryStage 		= new Stage();
 		mainArea			= new BorderPane();
 		menuBox				= new HBox();
@@ -98,14 +100,14 @@ public class MainWindow {
 		testBtn				= new Button("Test");
 		
 		speedLbl			= new Label("Speed: "+speed);
-		//Hier neue Elemente zum Hauptfenster hinzufügen
+		//Hier neue Elemente zum Hauptfenster hinzufï¿½gen
 		//vvvvvvvvvvvvvvvvvvvvvvv
 		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, speedLbl);
 		
 		//Sonstige Initialisierungen
 		mainArea.setTop(menuBox);
 		
-		// vvvvvvvvv Wenn ich die Elemente in die HBox einfüge fehlt mir immer das kleinste Unit-Element im Fenster
+		// vvvvvvvvv Wenn ich die Elemente in die HBox einfï¿½ge fehlt mir immer das kleinste Unit-Element im Fenster
 		//menuBox.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn);
 		menuBox.setPrefSize(mainWindowWidth, (1/5)*mainWindowHeight);
 		
@@ -192,7 +194,7 @@ public class MainWindow {
 			
 		} while(swapped);
 	}
-	public void generateUnits(int amount) {
+	/*public void generateUnits(int amount) {
 		units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
 			Rectangle tempUnit;
@@ -204,7 +206,7 @@ public class MainWindow {
 			tempUnit.setFill(Color.WHITE);
 			units.add(tempUnit);	
 		}	
-	}
+	}*/
 	public void posRandom() {
 		//Hilfsvektor um die Positionen zu speichern
 		Vector<Double> xPositios = new Vector<>();
@@ -223,7 +225,7 @@ public class MainWindow {
 		
 	}	
 	public void posNormal() {
-		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
+		//Damit die Units von Links nach Rechts der Grï¿½ï¿½e nach geordnet werden
 		reverseOrder();
 		
 		for(int i = 0; i < units.size(); i++) {
@@ -337,7 +339,8 @@ public class MainWindow {
 					removeUnitsFromWindow();
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
-				generateUnits(sampleSize);
+				units = UnitControl.generateUnits(sampleSize);
+				//generateUnits(sampleSize);   //Hier werden die Units in der MainWindow Klasse generiert
 				addUnitsToWindow();
 				initOrder();
 				initSwaps();
