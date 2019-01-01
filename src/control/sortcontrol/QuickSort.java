@@ -6,25 +6,23 @@ import java.util.Vector;
 import control.unitControl.Swap;
 import control.unitControl.UnitControl;
 import control.unitControl.UnitValues;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class BubbleSort extends Thread{
+public class QuickSort extends Thread{
 	private Vector<Swap> swaps;
 	private Vector<UnitValues> unitValues;
 	private Vector<Rectangle> units;
 	public static int delay;
 	
-	
-
-	public BubbleSort(Vector<Rectangle> units, Vector<UnitValues> unitValues, int initialDelay) {
+	public QuickSort(Vector<Rectangle> units, Vector<UnitValues> unitValues, int initialDelay) {
 		this.units 		= units;
 		this.unitValues = unitValues;
-		this.swaps 		= initSwaps();
+		initSwaps();
 		delay = initialDelay;
 	}
+	
+	
 	
 	public void run() {
 		for(int i = 0; i < swaps.size(); i++) {
@@ -35,7 +33,7 @@ public class BubbleSort extends Thread{
 			try {
 				Thread.sleep(delay/2);
 			} catch (InterruptedException e) {
-				
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			UnitControl.swapUnit(units, left, right);
@@ -44,7 +42,7 @@ public class BubbleSort extends Thread{
 			try {
 				Thread.sleep(delay/2);
 			} catch (InterruptedException e) {
-				
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			units.get(left).setFill(Color.WHITE);
@@ -52,27 +50,36 @@ public class BubbleSort extends Thread{
 			//Thread.sleep(delay/3);
 		}
 	}
+	private void initSwaps() {
+		swaps = new Vector<Swap>();
+		sort(unitValues, swaps, 0, unitValues.size()-1);		
+	}
+	private void sort(Vector<UnitValues> unitValues, Vector<Swap> swaps, int L, int R) {
+		if(R - L > 0) {
+			int p = partition(unitValues, L, R);
+			sort(unitValues, swaps, L, p - 1);
+			sort(unitValues, swaps, p + 1, R);
+		}
+	}
 	
-	
-	private Vector<Swap> initSwaps() {
-		Vector<Swap> swaps = new Vector<>();
-			
-		boolean swapped = false; 
-		do { 
-			swapped = false;
-			for(int i = 0; i < unitValues.size() - 1; i++) {
-				int left = i;
-				int right = i+1;
-				double leftHeight = unitValues.get(left).getHeight();
-				double rightHeight = unitValues.get(right).getHeight();
-				if(leftHeight > rightHeight) {
-					swaps.add(new Swap(left, right));
-					Collections.swap(unitValues, left, right);
-					swapped = true;
-				}				
-			}		
-		} while(swapped);
+	private int partition(Vector<UnitValues> unitValues, int L, int R) {
 		
-		return swaps;
-	}	
+		double p = unitValues.get(R).getHeight();
+		int i = L - 1;
+		for(int j = L; j < R; j++) {
+			if(unitValues.get(j).getHeight() <= p) {
+				i++;
+				swaps.add(new Swap(i, j));
+				System.out.println(unitValues+" wurde geaddet");
+				Collections.swap(unitValues, i, j);
+			}
+		}
+		swaps.add(new Swap(i + 1, R));
+		System.out.println(unitValues+" wurde geaddet");
+		Collections.swap(unitValues, i + 1 , R);
+		return i+1;
+	}
+	
+	
+	
 }

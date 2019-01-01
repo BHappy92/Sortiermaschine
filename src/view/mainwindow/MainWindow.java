@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import control.sortcontrol.BubbleSort;
+import control.sortcontrol.QuickSort;
 import control.unitControl.Swap;
 import control.unitControl.UnitControl;
 import control.unitControl.UnitValues;
@@ -107,7 +108,7 @@ public class MainWindow {
 		new Vector<Swap>();
 			algorithmsCB.getItems().addAll(
 							"BubbleSort",
-							"Quicksort",
+							"QuickSort",
 							"Countingsort" );
 			algorithmsCB.getSelectionModel().selectFirst();
 		ordersCB 			= new ComboBox<>();
@@ -221,19 +222,20 @@ public class MainWindow {
 
 			@Override
 			public void handle(ActionEvent event) {
-				if(unitsAreGenerated) {		
-					UnitControl.removeUnitsFromWindow(background, units);
+				
+				
+				if (!txtfSampleSize.getText().isEmpty()) {
+					if (unitsAreGenerated) {
+						UnitControl.removeUnitsFromWindow(background, units);
+					}
+					int sampleSize = Integer.parseInt(txtfSampleSize.getText());
+					units = UnitControl.generateUnits(sampleSize);
+					UnitControl.addUnitsToWindow(background, units);
+					initOrderCB();
+					txtfSampleSize.setText("");
+					txtfSampleSize.setPromptText(Integer.toString(sampleSize));
+					unitsAreGenerated = true;
 				}
-				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
-				units = UnitControl.generateUnits(sampleSize);
-				UnitControl.addUnitsToWindow(background, units);
-				
-				initOrderCB();
-				
-				
-				txtfSampleSize.setText("");
-				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
-				unitsAreGenerated = true;
 				
 				
 				//bubbleSort();
@@ -247,9 +249,16 @@ public class MainWindow {
 			public void handle(ActionEvent event) {
 				switch(algorithmsCB.getValue()) {
 					case "BubbleSort":
-						BubbleSort sort = new BubbleSort(units, unitValues, 200);
+						BubbleSort bubblesort = new BubbleSort(units, unitValues, 200);
 						delayLbl.setText("Delay: "+BubbleSort.delay);
-						sort.start();
+						bubblesort.start();
+						break;
+						
+					case "QuickSort":
+						QuickSort quicksort = new QuickSort(units, unitValues, 200);
+						delayLbl.setText("Delay: "+BubbleSort.delay);
+						quicksort.start();
+						break;
 				}
 				
 			}
