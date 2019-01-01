@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import control.unitControl.Swap;
 import control.unitControl.UnitControl;
+import control.unitControl.UnitValues;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -50,13 +51,14 @@ public class MainWindow {
 	private ComboBox<String> algorithmsCB;
 	private ComboBox<String> ordersCB;
 	private Button testBtn;
-	private Label speedLbl;	
-	private int speed;
+	private Label delayLbl;	
+	
 	private Vector<Rectangle> units;
 	private Vector<Swap> swaps;
+	private Vector<UnitValues> unitValues;
 	private boolean unitsAreGenerated = false;
 	
-	
+	private int delay = 200;
 	
 	public MainWindow() {
 		
@@ -111,10 +113,10 @@ public class MainWindow {
 			ordersCB.getSelectionModel().select(1);;
 		testBtn				= new Button("Test");
 		
-		speedLbl			= new Label("Speed: "+speed);
+		delayLbl			= new Label("Delay: "+delay);
 		//Hier neue Elemente zum Hauptfenster hinzufügen
 		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, speedLbl);
+		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, delayLbl);
 		
 		//Sonstige Initialisierungen
 		root.setTop(menuBox);
@@ -144,7 +146,7 @@ public class MainWindow {
 		algorithmsCB.relocate(250, 5);
 		ordersCB.relocate(100, 5);
 		testBtn.relocate(400, 5);
-		speedLbl.relocate(580, 5);
+		delayLbl.relocate(580, 5);
 	}	
 	private void styleComponents(){
 		scene.getStylesheets().add("util/style.css");
@@ -173,7 +175,7 @@ public class MainWindow {
 		menuBox.setStyle("-fx-background-color: black");
 		menuBox.setPadding(new Insets(5, 10, 5, 10));
 		
-		speedLbl.setTextFill(Color.WHITE);
+		delayLbl.setTextFill(Color.WHITE);
 	}
 	private void testComponents() {		
 		UnitControl.swapUnit(units, 1, 3);	
@@ -215,20 +217,24 @@ public class MainWindow {
 
 				@Override
 				protected Void call() throws Exception {
-					
+					System.out.println(swaps.size());
+					for(Swap temp : swaps) {
+						String ausgabe = "Left: " +temp.getLeft() + " Right: " + temp.getRight();
+						System.out.println(ausgabe);
+					}
 					for(int i = 0; i < swaps.size(); i++) {
 						int left = swaps.get(i).getLeft();
 						int right = swaps.get(i).getRight();
 						units.get(left).setFill(Color.RED);
 						units.get(right).setFill(Color.GREEN);
-						Thread.sleep(speed/3);
+						Thread.sleep(delay/3);
 						UnitControl.swapUnit(units, left, right);
 						units.get(left).setFill(Color.GREEN);
 						units.get(right).setFill(Color.RED);
-						Thread.sleep(speed/3);
+						Thread.sleep(delay/3);
 						units.get(left).setFill(Color.WHITE);
 						units.get(right).setFill(Color.WHITE);
-						Thread.sleep(speed/3);
+						//Thread.sleep(delay/3);
 					}
 					return null;	
 					
@@ -236,7 +242,7 @@ public class MainWindow {
 			};
 		}					
 	}; 
-	public void initOrder() {
+	public void initOrderCB() {
 		switch(ordersCB.getValue()) {
 		case "Ordered":
 			UnitControl.posNormal(units); 
@@ -244,7 +250,9 @@ public class MainWindow {
 			
 		case "Random":
 			UnitControl.posRandom(units); 
-			swaps = UnitControl.initSwaps(units);
+			unitValues = UnitControl.initUnitValues(units);
+			swaps = UnitControl.initSwaps(unitValues);
+			for(Rectangle unit : units) System.out.println(unit);
 			break;
 			
 		default: 
@@ -268,13 +276,13 @@ public class MainWindow {
 				
 				UnitControl.addUnitsToWindow(background, units);
 				
-				initOrder();
+				initOrderCB();
 				
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
 				unitsAreGenerated = true;
-				speed = 250;
-				speedLbl.setText("Speed: "+speed);
+				
+				
 				//bubbleSort();
 						
 			}				
@@ -298,8 +306,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				speed -= 10;
-				speedLbl.setText("Speed: "+speed);
+				delay -= 10;
+				delayLbl.setText("Delay: "+delay);
 			}
 		});
 		
@@ -307,8 +315,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				speed += 10;
-				speedLbl.setText("Speed: "+speed);
+				delay += 10;
+				delayLbl.setText("Delay: "+delay);
 			}
 		});
 	}	

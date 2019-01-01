@@ -10,12 +10,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import view.mainwindow.MainWindow;
 
+
 public class UnitControl {
+	
+	
 	public static Vector<Rectangle> generateUnits(int amount) {
 		Vector<Rectangle> units = new Vector<>(amount);	
 		for(int i = 0; i < amount; i++) {
 			Rectangle tempUnit;
-			
+			//System.out.println("Hier entsteht eine neue Unit");
 			//(...-40) damit man links und rechts einen Abstand vom mainWindow hat
 			double width = ((MainWindow.mainWindowWidth - 40) / amount) - 1;		
 			double height = (MainWindow.mainWindowHeight-100) - ((380/(amount-1))*i);
@@ -57,9 +60,20 @@ public class UnitControl {
 		for (int i = 0; i < units.size(); i++) {
 			units.get(i).setLayoutX(xPositios.get(i));;
 		}
-		for(Rectangle unit : units)
-			System.out.println("NEW: "+ unit);
+		
 	}	
+	
+	
+	public static Vector<UnitValues> initUnitValues(Vector<Rectangle> units) {
+		Vector<UnitValues> unitValues = new Vector<>();
+		for(int i = 0; i < units.size(); i++) {
+			double xPos = units.get(i).getLayoutX();
+			double height = units.get(i).getHeight();
+			unitValues.add(new UnitValues(xPos, height));
+		}
+		return unitValues;
+	}
+	
 	
 	public static void swapUnit(Vector<Rectangle> units, int left, int right) {	
 		double leftXPos = units.get(left).getLayoutX();
@@ -70,9 +84,6 @@ public class UnitControl {
 		
 	}
 	
-	private static void swapUnitInternally(Vector<Swap> swaps, int left,int right) {
-		
-	}
 	
 	public static void addUnitsToWindow(Pane background, Vector<Rectangle> units) {
 		for(int i = 0; i < units.size(); i++) {
@@ -93,7 +104,7 @@ public class UnitControl {
 		background.getChildren().remove(units.get(index));
 	}
 	
-	public static Vector<Swap> initSwaps(Vector<Rectangle> units) {
+	public static Vector<Swap> initSwaps(Vector<UnitValues> unitValues) {
 		//reverseOrder(units);
 		Vector<Swap> swaps = new Vector<>();
 		
@@ -101,17 +112,14 @@ public class UnitControl {
 		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
 		do { //Beginn des Durchlaufs
 			swapped = false;
-			for(int i = 0; i < units.size() - 1; i++) {
+			for(int i = 0; i < unitValues.size() - 1; i++) {
 				int left = i;
 				int right = i+1;
-				double leftHeight = units.get(left).getHeight();
-				double rightHeight = units.get(right).getHeight();
-				double leftXPos = units.get(left).getLayoutX();
-				double rightXPos = units.get(right).getLayoutX();
+				double leftHeight = unitValues.get(left).getHeight();
+				double rightHeight = unitValues.get(right).getHeight();
 				if(leftHeight > rightHeight) {
-					swaps.add(new Swap(left, right, leftHeight, rightHeight, leftXPos, rightXPos));
-					//Hier werden die Units tatsächlich geswappt und das WILL ICH NICHT!
-					swapUnit(units, left, right);
+					swaps.add(new Swap(left, right));
+					Collections.swap(unitValues, left, right);
 					swapped = true;
 				}	
 				
