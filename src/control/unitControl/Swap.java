@@ -1,12 +1,13 @@
 package control.unitControl;
 
-public class Koordinate {
+public class Swap {
 	private int left;
 	private int right;
 	
-	public Koordinate(int left, int right) {
+	public Swap(int left, int right) {
 		setLeft(left);
 		setRight(right);
+		
 	}
 	
 	public int getLeft() {

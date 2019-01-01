@@ -3,13 +3,15 @@ package view.mainwindow;
 import java.util.Collections;
 import java.util.Vector;
 
-import control.unitControl.Koordinate;
-import control.unitControl.Positionen;
+import control.unitControl.Swap;
+import control.unitControl.UnitControl;
+import control.unitControl.UnitValues;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -23,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
@@ -31,14 +34,18 @@ import javafx.stage.Stage;
 
 public class MainWindow {
 	
-	public static double mainWindowHeight = 800;
-	public static double mainWindowWidth  = 1500;
+	private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+	
+	//public static double mainWindowHeight = primaryScreenBounds.getHeight();
+	//public static double mainWindowWidth  = primaryScreenBounds.getWidth();
+	public static double mainWindowHeight = 600;
+	public static double mainWindowWidth  = 1200;
 	
 	private Stage primaryStage;
-	private BorderPane mainArea;
+	private BorderPane root;
+	private Scene scene;
 	private HBox menuBox;
 	private Pane background;	
-	private Scene scene;
 	private Button startBtn;
 	private Button backwardBtn;
 	private Button pauseBtn;
@@ -48,14 +55,14 @@ public class MainWindow {
 	private ComboBox<String> algorithmsCB;
 	private ComboBox<String> ordersCB;
 	private Button testBtn;
-	private Label speedLbl;	
-	private int speed;
+	private Label delayLbl;	
+	
 	private Vector<Rectangle> units;
-	private Vector<Koordinate> swaps;
-	//private Positionen positionen;
+	private Vector<Swap> swaps;
+	private Vector<UnitValues> unitValues;
 	private boolean unitsAreGenerated = false;
 	
-	
+	private int delay = 200;
 	
 	public MainWindow() {
 		
@@ -66,6 +73,16 @@ public class MainWindow {
 		//testComponents();
 		primaryStage.setScene(scene);
 		//primaryStage.setResizable(false);
+		
+		
+		
+
+        //set Stage boundaries to visible bounds of the main screen
+       // primaryStage.setX(primaryScreenBounds.getMinX());
+      //  primaryStage.setY(primaryScreenBounds.getMinY());
+       // primaryStage.setWidth(primaryScreenBounds.getWidth());
+      //  primaryStage.setHeight(primaryScreenBounds.getHeight());
+        
 		primaryStage.show();
 		
 	}
@@ -73,11 +90,11 @@ public class MainWindow {
 		//Initialisierung der Oberfl�chenkomponenten
 		//Oberfl�che wird erzeugt
 		primaryStage 		= new Stage();
-		mainArea			= new BorderPane();
+		root			= new BorderPane();
 		menuBox				= new HBox();
 		background 			= new Pane();
 		//scene 				= new Scene(background, mainWindowWidth, mainWindowHeight);
-		scene 				= new Scene(mainArea, mainWindowWidth, mainWindowHeight);
+		scene 				= new Scene(root, mainWindowWidth, mainWindowHeight);
 		startBtn			= new Button("START");
 		backwardBtn			= new Button();
 		pauseBtn 			= new Button();
@@ -85,7 +102,8 @@ public class MainWindow {
 		stepByStepToggle	= new ToggleButton("Step-By-Step");
 		txtfSampleSize		= new TextField();
 		algorithmsCB		= new ComboBox<>();
-		swaps 				= new Vector<Koordinate>();
+		
+		new Vector<Swap>();
 			algorithmsCB.getItems().addAll(
 							"BubbleSort",
 							"Quicksort",
@@ -99,19 +117,19 @@ public class MainWindow {
 			ordersCB.getSelectionModel().select(1);;
 		testBtn				= new Button("Test");
 		
-		speedLbl			= new Label("Speed: "+speed);
+		delayLbl			= new Label("Delay: "+delay);
 		//Hier neue Elemente zum Hauptfenster hinzuf�gen
 		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, speedLbl);
+		background.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn, delayLbl);
 		
 		//Sonstige Initialisierungen
-		mainArea.setTop(menuBox);
+		root.setTop(menuBox);
 		
 		// vvvvvvvvv Wenn ich die Elemente in die HBox einf�ge fehlt mir immer das kleinste Unit-Element im Fenster
 		//menuBox.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn);
 		menuBox.setPrefSize(mainWindowWidth, (1/5)*mainWindowHeight);
 		
-		mainArea.setCenter(background);
+		root.setCenter(background);
 		background.setPrefSize(mainWindowWidth, (4/5)*mainWindowHeight);
 
 		txtfSampleSize.setPromptText("Anzahl Elemente");
@@ -132,7 +150,7 @@ public class MainWindow {
 		algorithmsCB.relocate(250, 5);
 		ordersCB.relocate(100, 5);
 		testBtn.relocate(400, 5);
-		speedLbl.relocate(580, 5);
+		delayLbl.relocate(580, 5);
 	}	
 	private void styleComponents(){
 		scene.getStylesheets().add("util/style.css");
@@ -161,10 +179,10 @@ public class MainWindow {
 		menuBox.setStyle("-fx-background-color: black");
 		menuBox.setPadding(new Insets(5, 10, 5, 10));
 		
-		speedLbl.setTextFill(Color.WHITE);
+		delayLbl.setTextFill(Color.WHITE);
 	}
 	private void testComponents() {		
-		swapUnit(1, 3);	
+		UnitControl.swapUnit(units, 1, 3);	
 	}
 	public static void delayms(int delay) {
 		long now = 0;
@@ -184,7 +202,7 @@ public class MainWindow {
 			swapped = false;
 			for(int i = 0; i < units.size() - 1; i++) {
 				if(units.get(i).getHeight() > units.get(i+1).getHeight()) {
-					swapUnit(i, i+1);
+					UnitControl.swapUnit(units, i, i+1);
 					swapped = true;
 					
 					
@@ -194,108 +212,8 @@ public class MainWindow {
 			
 		} while(swapped);
 	}
-	/*public void generateUnits(int amount) {
-		units = new Vector<>(amount);	
-		for(int i = 0; i < amount; i++) {
-			Rectangle tempUnit;
-			
-			//(...-40) damit man links und rechts einen Abstand vom mainWindow hat
-			double width = ((mainWindowWidth - 40)/amount)-1;		
-			double height = 400-((380/(amount-1))*i);
-			tempUnit = new Rectangle(width, height);
-			tempUnit.setFill(Color.WHITE);
-			units.add(tempUnit);	
-		}	
-	}*/
-	public void posRandom() {
-		//Hilfsvektor um die Positionen zu speichern
-		Vector<Double> xPositios = new Vector<>();
-		posNormal();
-		
-		for(int i = 0; i < units.size(); i++) {
-			double tempPos = units.get(i).getLayoutX();
-			xPositios.add(tempPos);
-		}
-
-		Collections.shuffle(units);
-		
-		for (int i = 0; i < units.size(); i++) {
-			units.get(i).setLayoutX(xPositios.get(i));;
-		}
-		
-	}	
-	public void posNormal() {
-		//Damit die Units von Links nach Rechts der Gr��e nach geordnet werden
-		reverseOrder();
-		
-		for(int i = 0; i < units.size(); i++) {
-			double margin = i;
-			double xPos = (20 + margin) + i * (units.get(i).getWidth());
-			double yPos = mainWindowHeight - units.get(i).getHeight();
-			units.get(i).relocate(xPos, yPos);
-		}	
-	}	
-	public void swapUnit(int left, int right) {	
-		double leftXPos = units.get(left).getLayoutX();
-		double rightXPos = units.get(right).getLayoutX();
-		Collections.swap(units, left, right);
-		units.get(left).setLayoutX(leftXPos);
-		units.get(right).setLayoutX(rightXPos);
-		
-	}	
 	
-	public void swapUnit(Vector<Rectangle> units, int left, int right) {
-		double leftXPos = units.get(left).getLayoutX();
-		double rightXPos = units.get(right).getLayoutX();
-		Collections.swap(units, left, right);
-		units.get(left).setLayoutX(leftXPos);
-		units.get(right).setLayoutX(rightXPos);
-	}
-	public void reverseOrder() {
-		Collections.reverse(units);		
-	}	
-	public void addUnitsToWindow() {
-		for(int i = 0; i < units.size(); i++) {
-			background.getChildren().add(units.get(i));
-		}
-		
-	}
-	public void addUnitToWindow(int index) {
-		background.getChildren().add(units.get(index));
-	}
-	public void removeUnitsFromWindow() {
-		for(int i = 0; i < units.size(); i++) {
-			background.getChildren().remove(units.get(i));
-		}
-	}	
-	public void removeUnitFromWindow(int index) {
-		background.getChildren().remove(units.get(index));
-	}
-	//----------------------------Beustelle------------------------------
-	public void initSwaps() {
-		
-		Positionen positionen = new Positionen(units);
-	
-		boolean swapped = false; //Vermerkt ob Vertauschung im Durchlauf
-		do { //Beginn des Durchlaufs
-			swapped = false;
-			for(int i = 0; i < positionen.size() - 1; i++) {
-				int left = i;
-				int right = i+1;
-				
-				if(positionen.getY(left) > positionen.getY(right)) {
-					swaps.add(new Koordinate(left, right));
-					Positionen.swapX(positionen.getAllX(), left, right);
-					Positionen.swapY(positionen.getAllY(), left, right);
-					//System.out.println("Cunt:" + cunt);
-					swapped = true;
-				}	
-			}
-			
-		} while(swapped);
-	}
-	//-------------------------------------------------------------------
-	Service<Void> service = new Service<Void>() {
+	Service<Void> sort = new Service<Void>() {
 
 		@Override
 		protected Task<Void> createTask() {
@@ -303,28 +221,47 @@ public class MainWindow {
 
 				@Override
 				protected Void call() throws Exception {
-					for (int i = 0; i < swaps.size(); i++) {
+					System.out.println(swaps.size());
+					for(Swap temp : swaps) {
+						String ausgabe = "Left: " +temp.getLeft() + " Right: " + temp.getRight();
+						System.out.println(ausgabe);
+					}
+					for(int i = 0; i < swaps.size(); i++) {
 						int left = swaps.get(i).getLeft();
 						int right = swaps.get(i).getRight();
-						swapUnit(left, right);
-						Thread.sleep(speed);
+						units.get(left).setFill(Color.RED);
+						units.get(right).setFill(Color.GREEN);
+						Thread.sleep(delay/3);
+						UnitControl.swapUnit(units, left, right);
+						units.get(left).setFill(Color.GREEN);
+						units.get(right).setFill(Color.RED);
+						Thread.sleep(delay/3);
+						units.get(left).setFill(Color.WHITE);
+						units.get(right).setFill(Color.WHITE);
+						//Thread.sleep(delay/3);
 					}
-					return null;				
+					return null;	
+					
 				}							
 			};
 		}					
 	}; 
-	public void initOrder() {
+	public void initOrderCB() {
 		switch(ordersCB.getValue()) {
 		case "Ordered":
-			posNormal(); break;
+			UnitControl.posNormal(units); 
+			break;
 			
 		case "Random":
-			posRandom(); break;
+			UnitControl.posRandom(units); 
+			unitValues = UnitControl.initUnitValues(units);
+			swaps = UnitControl.initSwaps(unitValues);
+			for(Rectangle unit : units) System.out.println(unit);
+			break;
 			
 		default: 
 			if(ordersCB.getValue() == null)
-				posNormal();
+				UnitControl.posRandom(units);
 			break;
 		}
 	}
@@ -336,20 +273,20 @@ public class MainWindow {
 			@Override
 			public void handle(ActionEvent event) {
 				if(unitsAreGenerated) {		
-					removeUnitsFromWindow();
+					UnitControl.removeUnitsFromWindow(background, units);
 				}
 				int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 				units = UnitControl.generateUnits(sampleSize);
-				//generateUnits(sampleSize);   //Hier werden die Units in der MainWindow Klasse generiert
-				addUnitsToWindow();
-				initOrder();
-				initSwaps();
+				
+				UnitControl.addUnitsToWindow(background, units);
+				
+				initOrderCB();
 				
 				txtfSampleSize.setText("");
 				txtfSampleSize.setPromptText(Integer.toString(sampleSize));
 				unitsAreGenerated = true;
-				speed = 500;
-				speedLbl.setText("Speed: "+speed);
+				
+				
 				//bubbleSort();
 						
 			}				
@@ -361,10 +298,10 @@ public class MainWindow {
 			public void handle(ActionEvent event) {
 				//bubbleSort();
 				
-				if(service.isRunning()) {
-					service.cancel();
+				if(sort.isRunning()) {
+					sort.cancel();
 				}
-				service.restart();
+				sort.restart();
 				
 			}
 		});	
@@ -373,8 +310,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				speed -= 10;
-				speedLbl.setText("Speed: "+speed);
+				delay -= 10;
+				delayLbl.setText("Delay: "+delay);
 			}
 		});
 		
@@ -382,8 +319,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				speed += 10;
-				speedLbl.setText("Speed: "+speed);
+				delay += 10;
+				delayLbl.setText("Delay: "+delay);
 			}
 		});
 	}	
