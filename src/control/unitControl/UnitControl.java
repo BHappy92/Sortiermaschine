@@ -87,7 +87,7 @@ public class UnitControl {
 	}
 	
 	
-	public static void addUnitsToWindow(Pane background, Vector<Rectangle> units) {
+	public static void addUnits(Pane background, Vector<Rectangle> units) {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().add(units.get(i));
 			
@@ -97,7 +97,7 @@ public class UnitControl {
 	public static void addUnitToWindow(Pane background, Vector<Rectangle> units, int index) {
 		background.getChildren().add(units.get(index));
 	}
-	public static void removeUnitsFromWindow(Pane background, Vector<Rectangle> units) {
+	public static void removeUnits(Pane background, Vector<Rectangle> units) {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().remove(units.get(i));
 		}

@@ -15,7 +15,7 @@ public class BubbleSort extends Thread{
 	private Vector<Swap> swaps;
 	private Vector<UnitValues> unitValues;
 	private Vector<Rectangle> units;
-	public static int delay;
+
 	
 	
 
@@ -23,7 +23,7 @@ public class BubbleSort extends Thread{
 		this.units 		= units;
 		this.unitValues = unitValues;
 		this.swaps 		= initSwaps();
-		delay = initialDelay;
+		Sorts.delay = initialDelay;
 	}
 	
 	public void run() {
@@ -33,7 +33,7 @@ public class BubbleSort extends Thread{
 			units.get(left).setFill(Color.RED);
 			units.get(right).setFill(Color.GREEN);
 			try {
-				Thread.sleep(delay/2);
+				Thread.sleep(Sorts.delay/2);
 			} catch (InterruptedException e) {
 				
 				e.printStackTrace();
@@ -42,7 +42,7 @@ public class BubbleSort extends Thread{
 			units.get(left).setFill(Color.GREEN);
 			units.get(right).setFill(Color.RED);
 			try {
-				Thread.sleep(delay/2);
+				Thread.sleep(Sorts.delay/2);
 			} catch (InterruptedException e) {
 				
 				e.printStackTrace();

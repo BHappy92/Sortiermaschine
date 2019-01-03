@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import control.sortcontrol.BubbleSort;
 import control.sortcontrol.QuickSort;
+import control.sortcontrol.Sorts;
 import control.unitControl.Swap;
 import control.unitControl.UnitControl;
 import control.unitControl.UnitValues;
@@ -119,7 +120,7 @@ public class MainWindow {
 			ordersCB.getSelectionModel().select(1);;
 		startBtn				= new Button("Start");
 		
-		delayLbl			= new Label("Delay: "+BubbleSort.delay);
+		delayLbl			= new Label("Delay: "+Sorts.delay);
 		//Hier neue Elemente zum Hauptfenster hinzuf�gen
 		//vvvvvvvvvvvvvvvvvvvvvvv
 		background.getChildren().addAll(generateBtn, backwardBtn, pauseBtn, forwardBtn, 
@@ -128,8 +129,7 @@ public class MainWindow {
 		//Sonstige Initialisierungen
 		root.setTop(menuBox);
 		
-		// vvvvvvvvv Wenn ich die Elemente in die HBox einf�ge fehlt mir immer das kleinste Unit-Element im Fenster
-		//menuBox.getChildren().addAll(startBtn, backwardBtn, pauseBtn, forwardBtn, stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, testBtn);
+		
 		menuBox.setPrefSize(mainWindowWidth, (1/5)*mainWindowHeight);
 		
 		root.setCenter(background);
@@ -185,17 +185,7 @@ public class MainWindow {
 		delayLbl.setTextFill(Color.WHITE);
 	}
 	
-	public static void delayms(int delay) {
-		long now = 0;
-		long later = System.currentTimeMillis()+delay;
-		while (now < later) {
-			now = System.currentTimeMillis();
-			
-		}
-		
-		
-	}
-	
+
 	public void initOrderCB() {
 		switch(ordersCB.getValue()) {
 		case "Ordered":
@@ -226,11 +216,11 @@ public class MainWindow {
 				
 				if (!txtfSampleSize.getText().isEmpty()) {
 					if (unitsAreGenerated) {
-						UnitControl.removeUnitsFromWindow(background, units);
+						UnitControl.removeUnits(background, units);
 					}
 					int sampleSize = Integer.parseInt(txtfSampleSize.getText());
 					units = UnitControl.generateUnits(sampleSize);
-					UnitControl.addUnitsToWindow(background, units);
+					UnitControl.addUnits(background, units);
 					initOrderCB();
 					txtfSampleSize.setText("");
 					txtfSampleSize.setPromptText(Integer.toString(sampleSize));
@@ -250,13 +240,13 @@ public class MainWindow {
 				switch(algorithmsCB.getValue()) {
 					case "BubbleSort":
 						BubbleSort bubblesort = new BubbleSort(units, unitValues, 200);
-						delayLbl.setText("Delay: "+BubbleSort.delay);
+						delayLbl.setText("Delay: "+Sorts.delay);
 						bubblesort.start();
 						break;
 						
 					case "QuickSort":
 						QuickSort quicksort = new QuickSort(units, unitValues, 200);
-						delayLbl.setText("Delay: "+BubbleSort.delay);
+						delayLbl.setText("Delay: "+Sorts.delay);
 						quicksort.start();
 						break;
 				}
@@ -268,8 +258,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				BubbleSort.delay -= 10;
-				delayLbl.setText("Delay: "+BubbleSort.delay);
+				Sorts.delay -= 10;
+				delayLbl.setText("Delay: " + Sorts.delay);
 			}
 		});
 		
@@ -277,8 +267,8 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				BubbleSort.delay += 10;
-				delayLbl.setText("Delay: "+BubbleSort.delay);
+				Sorts.delay += 10;
+				delayLbl.setText("Delay: " + Sorts.delay);
 			}
 		});
 	}	
