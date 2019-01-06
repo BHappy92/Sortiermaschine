@@ -30,21 +30,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-
-
-
+import view.units.Unit;
 
 public class MainWindow {
 	
-	private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-	
+	private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();	
 	//public static double mainWindowHeight = primaryScreenBounds.getHeight();
 	//public static double mainWindowWidth  = primaryScreenBounds.getWidth();
 	public static double mainWindowHeight = 600;
 	public static double mainWindowWidth  = 1200;
 	
-	private Stage primaryStage;
 	private BorderPane root;
 	private Scene scene;
 	private HBox menuBox;
@@ -61,13 +56,11 @@ public class MainWindow {
 	private Label delayLbl;	
 	
 	private Vector<Rectangle> units;
-	private Vector<Swap> swaps;
+	
 	private Vector<UnitValues> unitValues;
 	private boolean unitsAreGenerated = false;
 	
-	
-	
-	public MainWindow() {
+	public MainWindow(Stage primaryStage) {
 		
 		initComponents();	
 		posComponents();
@@ -76,9 +69,6 @@ public class MainWindow {
 		//testComponents();
 		primaryStage.setScene(scene);
 		//primaryStage.setResizable(false);
-		
-		
-		
 
         //set Stage boundaries to visible bounds of the main screen
        // primaryStage.setX(primaryScreenBounds.getMinX());
@@ -92,11 +82,11 @@ public class MainWindow {
 	private void initComponents() {
 		//Initialisierung der Oberfl�chenkomponenten
 		//Oberfl�che wird erzeugt
-		primaryStage 		= new Stage();
-		root			= new BorderPane();
+	
+		root				= new BorderPane();
 		menuBox				= new HBox();
 		background 			= new Pane();
-		//scene 				= new Scene(background, mainWindowWidth, mainWindowHeight);
+		//scene 			= new Scene(background, mainWindowWidth, mainWindowHeight);
 		scene 				= new Scene(root, mainWindowWidth, mainWindowHeight);
 		generateBtn			= new Button("Generate");
 		backwardBtn			= new Button();
@@ -104,22 +94,19 @@ public class MainWindow {
 		forwardBtn			= new Button();
 		stepByStepToggle	= new ToggleButton("Step-By-Step");
 		txtfSampleSize		= new TextField();
-		algorithmsCB		= new ComboBox<>();
 		
-		new Vector<Swap>();
+		algorithmsCB		= new ComboBox<>();
 			algorithmsCB.getItems().addAll(
 							"BubbleSort",
 							"QuickSort",
 							"Countingsort" );
 			algorithmsCB.getSelectionModel().selectFirst();
+			
 		ordersCB 			= new ComboBox<>();
-			ordersCB.getItems().addAll(
-							"Ordered",
-							"Random"
-					);
+			ordersCB.getItems().addAll("Ordered", "Random");
 			ordersCB.getSelectionModel().select(1);;
-		startBtn				= new Button("Start");
 		
+		startBtn			= new Button("Start");
 		delayLbl			= new Label("Delay: "+Sorts.delay);
 		//Hier neue Elemente zum Hauptfenster hinzuf�gen
 		//vvvvvvvvvvvvvvvvvvvvvvv
@@ -139,9 +126,7 @@ public class MainWindow {
 		txtfSampleSize.setPrefWidth(55);
 		
 		algorithmsCB.setPromptText("Algorithmus");
-		ordersCB.setPromptText("Anordnung");
-		
-		
+		ordersCB.setPromptText("Anordnung");	
 	}
 	private void posComponents() {
 		generateBtn.relocate(5, 5);
@@ -155,6 +140,7 @@ public class MainWindow {
 		startBtn.relocate(400, 5);
 		delayLbl.relocate(580, 5);
 	}	
+	
 	private void styleComponents(){
 		scene.getStylesheets().add("util/style.css");
 		background.getStyleClass().add("pane");
@@ -212,8 +198,6 @@ public class MainWindow {
 
 			@Override
 			public void handle(ActionEvent event) {
-				
-				
 				if (!txtfSampleSize.getText().isEmpty()) {
 					if (unitsAreGenerated) {
 						UnitControl.removeUnits(background, units);
@@ -225,11 +209,7 @@ public class MainWindow {
 					txtfSampleSize.setText("");
 					txtfSampleSize.setPromptText(Integer.toString(sampleSize));
 					unitsAreGenerated = true;
-				}
-				
-				
-				//bubbleSort();
-						
+				}		
 			}				
 		});
 		
@@ -249,8 +229,7 @@ public class MainWindow {
 						delayLbl.setText("Delay: "+Sorts.delay);
 						quicksort.start();
 						break;
-				}
-				
+				}	
 			}
 		});	
 		
