@@ -12,7 +12,8 @@ import view.mainwindow.MainWindow;
 public class UnitControl {
 	
 	/*
-	 * n steht f�r die Anzahl der Units
+	 * Als Parameter wird die gewünschte Anzahl an zu generierenden
+	 * Units übergeben
 	 * */
 	public static Vector<Rectangle> generateUnits(int n) {
 		Vector<Rectangle> units = new Vector<>(n);	
@@ -31,11 +32,12 @@ public class UnitControl {
 		}	
 		return units;
 	}
-	
+	/**
+	 * Positioniert die Units der Größe nach aufsteigend von 
+	 * links nach rechts
+	 */
 	public static void posNormal(Vector<Rectangle> units) {
-		//Damit die Units von Links nach Rechts der Gr��e nach geordnet werden
-		//reverseOrder(units);
-		
+	
 		for(int i = 0; i < units.size(); i++) {
 			double margin = i;
 			double xPos = (20 + margin) + i * (units.get(i).getWidth());
@@ -43,10 +45,19 @@ public class UnitControl {
 			units.get(i).relocate(xPos, yPos);
 		}	
 	}
+
+	/**
+	 * Kehrt die Reihenfolge aller Units um
+	 * 
+	 */
 	public static void reverseOrder(Vector<Rectangle> units) {
 		Collections.reverse(units);		
 	}	
 	
+	/**
+	 * Positioniert alle Units an zufällige Positionen
+	 * 
+	 */
 	public static void posRandom(Vector<Rectangle> units) {
 		//Hilfsvektor um die Positionen zu speichern
 		Vector<Double> xPositios = new Vector<>();
@@ -65,7 +76,10 @@ public class UnitControl {
 		
 	}	
 	
-	
+	/**
+	 * Die Werte der Units werden bei den Sortieralgorithmen benötigt
+	 * damit nicht mit den Units selbst hin und her geschoben wird
+	 */
 	public static Vector<UnitValues> initUnitValues(Vector<Rectangle> units) {
 		Vector<UnitValues> unitValues = new Vector<>();
 		for(int i = 0; i < units.size(); i++) {
@@ -76,7 +90,9 @@ public class UnitControl {
 		return unitValues;
 	}
 	
-	
+	/**
+	 * Methode zum Postionswechsel zweier Units
+	 */
 	public static void swapUnit(Vector<Rectangle> units, int left, int right) {	
 		double leftXPos = units.get(left).getLayoutX();
 		double rightXPos = units.get(right).getLayoutX();
@@ -86,7 +102,12 @@ public class UnitControl {
 		
 	}
 	
-	
+	/**
+	 * Fügt die Units zum MainWindow hinzu
+	 * @param background
+	 * Bekommt den Hintergrund vom MainWindow als Parameter
+	 * @param units
+	 */
 	public static void addUnits(Pane background, Vector<Rectangle> units) {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().add(units.get(i));
@@ -94,14 +115,29 @@ public class UnitControl {
 		}
 		
 	}
+
+	/**
+	 * Fügt eine einzige Unit zum MainWindow hinzu
+	 */
 	public static void addUnitToWindow(Pane background, Vector<Rectangle> units, int index) {
 		background.getChildren().add(units.get(index));
 	}
+
+	/**
+	 * Entfernt alle Units vom MainWindow
+	 * @param background
+	 * Bekommt den Hintergrund vom MainWindow als Parameter
+	 * @param units
+	 */
 	public static void removeUnits(Pane background, Vector<Rectangle> units) {
 		for(int i = 0; i < units.size(); i++) {
 			background.getChildren().remove(units.get(i));
 		}
-	}	
+	}
+	
+	/**
+	 * Entfernt eine einzige Unit vom MainWindow
+	 */
 	public static void removeUnitFromWindow(Pane background, Vector<Rectangle> units, int index) {
 		background.getChildren().remove(units.get(index));
 	}

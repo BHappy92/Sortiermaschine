@@ -1,6 +1,5 @@
 package view.mainwindow;
 
-import java.util.Collections;
 import java.util.Vector;
 
 import control.sortcontrol.BubbleSort;
@@ -9,12 +8,9 @@ import control.sortcontrol.Sorts;
 import control.unitControl.Swap;
 import control.unitControl.UnitControl;
 import control.unitControl.UnitValues;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -28,19 +24,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Screen;
+
 import javafx.stage.Stage;
-
-
-
-
 
 public class MainWindow {
 	
-	private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-	
-	//public static double mainWindowHeight = primaryScreenBounds.getHeight();
-	//public static double mainWindowWidth  = primaryScreenBounds.getWidth();
 	public static double mainWindowHeight = 600;
 	public static double mainWindowWidth  = 1200;
 	
@@ -61,11 +49,8 @@ public class MainWindow {
 	private Label delayLbl;	
 	
 	private Vector<Rectangle> units;
-	private Vector<Swap> swaps;
 	private Vector<UnitValues> unitValues;
 	private boolean unitsAreGenerated = false;
-	
-	
 	
 	public MainWindow() {
 		
@@ -73,30 +58,16 @@ public class MainWindow {
 		posComponents();
 		styleComponents();
 		addFunctionality();
-		//testComponents();
+		
 		primaryStage.setScene(scene);
-		//primaryStage.setResizable(false);
-		
-		
-		
-
-        //set Stage boundaries to visible bounds of the main screen
-       // primaryStage.setX(primaryScreenBounds.getMinX());
-      //  primaryStage.setY(primaryScreenBounds.getMinY());
-       // primaryStage.setWidth(primaryScreenBounds.getWidth());
-      //  primaryStage.setHeight(primaryScreenBounds.getHeight());
-        
 		primaryStage.show();
 		
 	}
 	private void initComponents() {
-		//Initialisierung der Oberfl�chenkomponenten
-		//Oberfl�che wird erzeugt
 		primaryStage 		= new Stage();
 		root			= new BorderPane();
 		menuBox				= new HBox();
 		background 			= new Pane();
-		//scene 				= new Scene(background, mainWindowWidth, mainWindowHeight);
 		scene 				= new Scene(root, mainWindowWidth, mainWindowHeight);
 		generateBtn			= new Button("Generate");
 		backwardBtn			= new Button();
@@ -120,13 +91,12 @@ public class MainWindow {
 			ordersCB.getSelectionModel().select(1);;
 		startBtn				= new Button("Start");
 		
-		delayLbl			= new Label("Delay: "+Sorts.delay);
-		//Hier neue Elemente zum Hauptfenster hinzuf�gen
-		//vvvvvvvvvvvvvvvvvvvvvvv
-		background.getChildren().addAll(generateBtn, backwardBtn, pauseBtn, forwardBtn, 
-				stepByStepToggle, txtfSampleSize, algorithmsCB, ordersCB, startBtn, delayLbl);
+		delayLbl			= new Label("Delay: "+Sorts.delay + "ms");
 		
-		//Sonstige Initialisierungen
+		background.getChildren().addAll(generateBtn, backwardBtn, pauseBtn, forwardBtn, 
+				/*stepByStepToggle,*/ txtfSampleSize, algorithmsCB, ordersCB, startBtn, delayLbl);
+		
+		
 		root.setTop(menuBox);
 		
 		
@@ -158,21 +128,21 @@ public class MainWindow {
 	private void styleComponents(){
 		scene.getStylesheets().add("util/style.css");
 		background.getStyleClass().add("pane");
-		//Style pausebutton
+		
 		Image pause=new Image("util/images/pause.png");
 		ImageView iv1=new ImageView(pause);
 		iv1.setFitHeight(30);
 		iv1.setFitWidth(30);
 		pauseBtn.setGraphic(iv1);
 		
-		//Style playbutton
+		
 		Image play=new Image("util/images/play.png");
 		ImageView iv2=new ImageView(play);
 		iv2.setFitHeight(30);
 		iv2.setFitWidth(30);
 		forwardBtn.setGraphic(iv2);
 		
-		//Style backbutton
+		
 		Image back=new Image("util/images/back.png");
 		ImageView iv3=new ImageView(back);
 		iv3.setFitHeight(30);
@@ -213,7 +183,6 @@ public class MainWindow {
 			@Override
 			public void handle(ActionEvent event) {
 				
-				
 				if (!txtfSampleSize.getText().isEmpty()) {
 					if (unitsAreGenerated) {
 						UnitControl.removeUnits(background, units);
@@ -222,14 +191,12 @@ public class MainWindow {
 					units = UnitControl.generateUnits(sampleSize);
 					UnitControl.addUnits(background, units);
 					initOrderCB();
+					
 					txtfSampleSize.setText("");
 					txtfSampleSize.setPromptText(Integer.toString(sampleSize));
+					
 					unitsAreGenerated = true;
-				}
-				
-				
-				//bubbleSort();
-						
+				}		
 			}				
 		});
 		
@@ -240,13 +207,13 @@ public class MainWindow {
 				switch(algorithmsCB.getValue()) {
 					case "BubbleSort":
 						BubbleSort bubblesort = new BubbleSort(units, unitValues, 200);
-						delayLbl.setText("Delay: "+Sorts.delay);
+						delayLbl.setText("Delay: "+Sorts.delay + "ms");
 						bubblesort.start();
 						break;
 						
 					case "QuickSort":
 						QuickSort quicksort = new QuickSort(units, unitValues, 200);
-						delayLbl.setText("Delay: "+Sorts.delay);
+						delayLbl.setText("Delay: "+Sorts.delay + "ms");
 						quicksort.start();
 						break;
 				}
@@ -258,8 +225,11 @@ public class MainWindow {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				Sorts.delay -= 10;
-				delayLbl.setText("Delay: " + Sorts.delay);
+				
+				if(Sorts.delay >= 60) 			
+					Sorts.delay -= 10;
+
+				delayLbl.setText("Delay: " + Sorts.delay + "ms");
 			}
 		});
 		
@@ -268,8 +238,10 @@ public class MainWindow {
 			@Override
 			public void handle(ActionEvent event) {
 				Sorts.delay += 10;
-				delayLbl.setText("Delay: " + Sorts.delay);
+				delayLbl.setText("Delay: " + Sorts.delay + "ms");
 			}
 		});
+
+		
 	}	
 }
