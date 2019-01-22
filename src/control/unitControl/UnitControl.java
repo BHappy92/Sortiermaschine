@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.Vector;
 
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import view.mainwindow.MainWindow;
 import view.units.Unit;
 
@@ -13,24 +11,10 @@ import view.units.Unit;
 public class UnitControl {
 	
 	/*
-	 * n steht für die Anzahl der Units
+	 *@param Als Parameter wirde die Anzahl der zu generierenden Units Ã¼bergeben
+	 *  
 	 * */
 	public static Vector<Unit> generateUnits(int n) {
-		/*Vector<Rectangle> units = new Vector<>(n);	
-		double minHeight = 50;
-		double maxHeight = MainWindow.mainWindowHeight-100;
-		double delta = (maxHeight - minHeight) / n;
-		for(int i = 0; i < n; i++) {
-			Rectangle tempUnit;
-			
-			double width = ((MainWindow.mainWindowWidth - 40) / n) - 1;
-			double height = minHeight + i*delta;
-		
-			tempUnit = new Rectangle(width, height);
-			tempUnit.setFill(Color.WHITE);
-			units.add(tempUnit);	
-		}	
-		return units;*/
 		Vector<Unit> units = new Vector<Unit>(n);
 		double minHeight = 50;
 		double maxHeight = MainWindow.mainWindowHeight-100;
@@ -47,14 +31,10 @@ public class UnitControl {
 	//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	
 	public static void posNormal(Vector<Unit> units) {
-		//Damit die Units von Links nach Rechts der Größe nach geordnet werden
-		//reverseOrder(units);
-		
 		for(int i = 0; i < units.size(); i++) {
 			double margin = i;
 			double x = (20 + margin) + i * (units.get(i).getWidth());
 			double y = MainWindow.mainWindowHeight - units.get(i).getHeight();
-			//units.get(i).relocate(xPos, yPos);
 			units.get(i).relocateUnit(x, y);
 		}	
 	}
@@ -62,7 +42,7 @@ public class UnitControl {
 		Collections.reverse(units);		
 	}	
 	
-	public static void posRandom(Vector<Rectangle> units) {
+	public static void posRandom(Vector<Unit> units) {
 		//Hilfsvektor um die Positionen zu speichern
 		Vector<Double> xPositios = new Vector<>();
 		posNormal(units);
@@ -77,11 +57,10 @@ public class UnitControl {
 		for (int i = 0; i < units.size(); i++) {
 			units.get(i).setLayoutX(xPositios.get(i));;
 		}
-		
 	}	
 	
 	
-	public static Vector<UnitValues> initUnitValues(Vector<Rectangle> units) {
+	public static Vector<UnitValues> initUnitValues(Vector<Unit> units) {
 		Vector<UnitValues> unitValues = new Vector<>();
 		for(int i = 0; i < units.size(); i++) {
 			double xPos = units.get(i).getLayoutX();
@@ -92,7 +71,7 @@ public class UnitControl {
 	}
 	
 	
-	public static void swapUnit(Vector<Rectangle> units, int left, int right) {	
+	public static void swapUnit(Vector<Unit> units, int left, int right) {	
 		double leftXPos = units.get(left).getLayoutX();
 		double rightXPos = units.get(right).getLayoutX();
 		Collections.swap(units, left, right);
@@ -102,20 +81,16 @@ public class UnitControl {
 	}
 	
 	
-	public static void addUnits(Pane background, Vector<Rectangle> units) {
+	public static void addUnits(Pane background, Vector<Unit> units) {
 		for(int i = 0; i < units.size(); i++) {
-			background.getChildren().add(units.get(i));
-			
-		}
-		
+			background.getChildren().add(units.get(i).getAnchor());
+		}	
 	}
 	
-	public static void removeUnits(Pane background, Vector<Rectangle> units) {
+	public static void removeUnits(Pane background, Vector<Unit> units) {
 		for(int i = 0; i < units.size(); i++) {
-			background.getChildren().remove(units.get(i));
+			background.getChildren().remove(units.get(i).getAnchor());
 		}
 	}	
-	
-
 	
 }

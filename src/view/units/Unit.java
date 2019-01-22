@@ -18,13 +18,16 @@ public class Unit {
 	
 	public Unit(double width, double height) {
 		unit = new Rectangle(width, height);
-		unit.setFill(Color.WHITE);
+		setFill(Color.WHITE);
 		
 		indexLbl = new Label();
 		indexLbl.setTextFill(Color.BLACK);
 		
 		anchor = new StackPane(unit, indexLbl);
-		
+	}
+
+	public StackPane getAnchor() {
+		return anchor;
 	}
 
 	public double getWidth() {
@@ -61,5 +64,17 @@ public class Unit {
 	
 	public void relocateUnit(double x, double y) {
 		anchor.relocate(x, y);
+	}
+
+	public void setIndexLabel(String index) {
+		indexLbl.setText(index);
+	}
+
+	public String getIndexLabel(String index) {
+		return indexLbl.getText();
+	}
+
+	public void setFill(Color color) {
+		unit.setFill(color);
 	}
 }

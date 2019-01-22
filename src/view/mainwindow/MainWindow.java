@@ -1,20 +1,18 @@
 package view.mainwindow;
 
-import java.util.Collections;
 import java.util.Vector;
 
 import control.sortcontrol.BubbleSort;
 import control.sortcontrol.QuickSort;
 import control.sortcontrol.Sorts;
-import control.unitControl.Swap;
+
 import control.unitControl.UnitControl;
 import control.unitControl.UnitValues;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
+import view.units.Unit;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -27,14 +25,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import view.units.Unit;
+
 
 public class MainWindow {
 	
-	private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();	
+	//private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();	
 	//public static double mainWindowHeight = primaryScreenBounds.getHeight();
 	//public static double mainWindowWidth  = primaryScreenBounds.getWidth();
 	public static double mainWindowHeight = 600;
@@ -55,8 +51,7 @@ public class MainWindow {
 	private Button startBtn;
 	private Label delayLbl;	
 	
-	private Vector<Rectangle> units;
-	
+	private Vector<Unit> units;
 	private Vector<UnitValues> unitValues;
 	private boolean unitsAreGenerated = false;
 	
@@ -66,9 +61,8 @@ public class MainWindow {
 		posComponents();
 		styleComponents();
 		addFunctionality();
-		//testComponents();
 		primaryStage.setScene(scene);
-		//primaryStage.setResizable(false);
+		primaryStage.setResizable(false);
 
         //set Stage boundaries to visible bounds of the main screen
        // primaryStage.setX(primaryScreenBounds.getMinX());
@@ -80,13 +74,10 @@ public class MainWindow {
 		
 	}
 	private void initComponents() {
-		//Initialisierung der Oberfl�chenkomponenten
-		//Oberfl�che wird erzeugt
-	
+		//Initialisierung der Oberflächenkomponenten
 		root				= new BorderPane();
 		menuBox				= new HBox();
 		background 			= new Pane();
-		//scene 			= new Scene(background, mainWindowWidth, mainWindowHeight);
 		scene 				= new Scene(root, mainWindowWidth, mainWindowHeight);
 		generateBtn			= new Button("Generate");
 		backwardBtn			= new Button();
@@ -225,7 +216,7 @@ public class MainWindow {
 						break;
 						
 					case "QuickSort":
-						QuickSort quicksort = new QuickSort(units, unitValues, 200);
+						QuickSort quicksort = new QuickSort(units, unitValues,200);
 						delayLbl.setText("Delay: "+Sorts.delay);
 						quicksort.start();
 						break;
