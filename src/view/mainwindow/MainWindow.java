@@ -80,8 +80,8 @@ public class MainWindow {
 		new Vector<Swap>();
 			algorithmsCB.getItems().addAll(
 							"BubbleSort",
-							"QuickSort",
-							"Countingsort" );
+							"QuickSort"
+							);
 			algorithmsCB.getSelectionModel().selectFirst();
 		ordersCB 			= new ComboBox<>();
 			ordersCB.getItems().addAll(
